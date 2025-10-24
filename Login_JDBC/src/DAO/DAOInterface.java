@@ -17,6 +17,7 @@ public interface DAOInterface<T> {
     public int deleteObject(T t);
     public int updateObject(T t);
     public int countObjects(String type);
+    public T getObject(String email, String type);
     public boolean checkExistObject(String email);
     public ArrayList<Account> showAll();
 

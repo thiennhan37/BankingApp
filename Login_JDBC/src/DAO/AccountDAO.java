@@ -6,10 +6,13 @@ package DAO;
 
 import Database.MyDatabase;
 import Model.Account;
+import Model.Customer;
+import Model.Staff;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -125,9 +128,6 @@ public class AccountDAO implements DAOInterface<Account>{
             PreparedStatement state = connect.prepareStatement(command);
             ResultSet result = state.executeQuery(command);
             while(result.next()){
-                String username = result.getString("username");
-                String password = result.getString("password");
-                int age = result.getInt("age");
             }
         }
         catch(SQLException e){
@@ -135,6 +135,38 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         MyDatabase.closeConnection(connect);
         return resultArray;
+    }
+
+    @Override
+    public Account getObject(String email, String type) {
+        Connection connect = MyDatabase.getConnection();
+        Account ac  = null; 
+        String id, fullName, password, gender;
+        LocalDate birthDay;
+        boolean active;
+        try{
+            String command = "SELECT * FROM accounts WHERE email = ?";
+            PreparedStatement statement = connect.prepareStatement(command);
+            statement.setString(1, email);
+            ResultSet rs = statement.executeQuery(); rs.next();
+            id = rs.getString("id"); 
+            fullName = rs.getString("fullName");
+            password = rs.getString("password"); gender = rs.getString("gender");
+            birthDay = rs.getDate("birthDay").toLocalDate();
+            active = rs.getBoolean("active");
+            if(type.equals("Customer")){
+                Double balance = rs.getDouble("balance");
+                ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
+            }
+            else if(type.equals("Staff")){
+                String branch = rs.getString("branch");
+                ac = new Staff(id, fullName, email, password, gender, birthDay, active, branch);
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        return ac;
     }
 
     

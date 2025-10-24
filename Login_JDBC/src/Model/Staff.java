@@ -20,7 +20,11 @@ public class Staff extends Account{
         this.branch = branch;
         this.id = "STF" + String.format("%03d", ++number);
     }
-    
+    public Staff(String id, String fullName, String email, String password, String gender, LocalDate birthDay, boolean active, String branch) {
+        super(fullName, email, password, gender, birthDay, active);
+        this.branch = branch;
+        this.id = id;
+    }
     @Override
     public String getType() {
         return "Staff";

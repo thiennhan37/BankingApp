@@ -4,6 +4,8 @@
  */
 package View;
 
+import Control.AccountControl;
+import Model.Account;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -14,6 +16,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 import javax.swing.*;
 
 /**
@@ -27,27 +32,52 @@ public class FormCustomer extends javax.swing.JFrame {
     /**
      * Creates new form FormCustomer
      */
+    private AccountControl controller;
+    private Account myAccount;
+    private String myEmail;
+    private CardLayout cardLayout3;
+    private boolean isOpenEye3 = true;
+    private ImageIcon openEyeImage = new javax.swing.ImageIcon(getClass().getResource("/MyImage/seenEye.png"));
+    private ImageIcon closeEyeImage = new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"));
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
-    public FormCustomer() {
+    public FormCustomer(String myEmail) {
         try {
-            FlatIntelliJLaf.setup();
+            FlatLightLaf.setup();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.myEmail = myEmail;
+        controller = new AccountControl(this);
         initComponents();
+        myAccount = controller.getAccount(myEmail, "Customer");
+        resetAccountInfo();
+        txtPassword3.setEchoChar((char) 0); 
+        cardLayout3 = (CardLayout) pnlCard.getLayout();
+        
         settingComponent();
         setMouseList();
         this.setLocationRelativeTo(null);
         
     } 
-    void settingComponent(){
+    private void settingComponent(){
         // btHistory.putClientProperty(FlatClientProperties.STYLE,"arc:0; ");
-    }
-    void setMouseList(){
+        btSaveInfo3.putClientProperty(FlatClientProperties.STYLE,"arc:25; ");
+        btChangePass3.putClientProperty(FlatClientProperties.STYLE,"arc:25; ");
+        
+        lblEmail3.putClientProperty("FlatLaf.style", "arc:20; background:#F0F8FF;");
+        txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        fieldDay3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        fieldMonth3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        fieldYear3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        txtPassword3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        txtConfirmPass3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+    }   
+    
+    private void setMouseList(){
         JButton[] arr = {btHome, btHistory, btTrans, btWithDraw, btDeposit, btStatics, btLogout};
         
         for(int i = 0; i < arr.length; i++){
@@ -93,7 +123,21 @@ public class FormCustomer extends javax.swing.JFrame {
             });
         }
     }
-
+    private void resetAccountInfo(){
+        txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        lblFullName3.setText(myAccount.getFullName());
+        lblAccNumber3.setText(myAccount.getId());
+        lblBalance3.setText(myAccount.getBalace().toString());
+        lblEmail3.setText("   " + myAccount.getEmail());
+        txtFullName3.setText(myAccount.getFullName());
+        fieldDay3.setSelectedIndex(myAccount.getBirthDay().getDayOfMonth() - 1);
+        fieldMonth3.setSelectedIndex(myAccount.getBirthDay().getMonthValue() - 1);
+        fieldYear3.setSelectedIndex(myAccount.getBirthDay().getYear() - 1900);
+        if(myAccount.getGender().equals("Female")){
+            btFemale3.setSelected(true);
+        }
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -103,13 +147,14 @@ public class FormCustomer extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        GenderGroup3 = new javax.swing.ButtonGroup();
         pnlTop = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        btReset3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblAccNumber3 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lblBalance3 = new javax.swing.JLabel();
+        lblFullName3 = new javax.swing.JLabel();
         pnlMenu = new javax.swing.JPanel();
         btHome = new javax.swing.JButton();
         btHistory = new javax.swing.JButton();
@@ -126,6 +171,29 @@ public class FormCustomer extends javax.swing.JFrame {
         lblLineCol1 = new javax.swing.JLabel();
         lblLineRow2 = new javax.swing.JLabel();
         pnlCard = new javax.swing.JPanel();
+        pnlCardProfile = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        txtFullName3 = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        fieldDay3 = new javax.swing.JComboBox<>();
+        fieldMonth3 = new javax.swing.JComboBox<>();
+        fieldYear3 = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        btMale3 = new javax.swing.JRadioButton();
+        btFemale3 = new javax.swing.JRadioButton();
+        btSaveInfo3 = new javax.swing.JButton();
+        lblEmail3 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        btEyePass3 = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        txtPassword3 = new javax.swing.JPasswordField();
+        txtConfirmPass3 = new javax.swing.JPasswordField();
+        jLabel10 = new javax.swing.JLabel();
+        btChangePass3 = new javax.swing.JButton();
         pnlCardHistory = new javax.swing.JPanel();
         pnlCardTransfer = new javax.swing.JPanel();
 
@@ -134,31 +202,34 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlTop.setBackground(new java.awt.Color(153, 255, 255));
 
-        jButton1.setBackground(new java.awt.Color(153, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/reset.png"))); // NOI18N
-        jButton1.setBorderPainted(false);
+        btReset3.setBackground(new java.awt.Color(153, 255, 255));
+        btReset3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/reset.png"))); // NOI18N
+        btReset3.setBorderPainted(false);
+        btReset3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btReset3ActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 102, 102));
         jLabel1.setText("Account Number");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("999001");
+        lblAccNumber3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblAccNumber3.setForeground(new java.awt.Color(255, 255, 255));
+        lblAccNumber3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(102, 102, 102));
         jLabel3.setText("Balance");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel4.setText("1000000");
+        lblBalance3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblBalance3.setForeground(new java.awt.Color(255, 255, 255));
+        lblBalance3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel5.setText("NGUYEN THIEN NHAN");
+        lblFullName3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblFullName3.setForeground(new java.awt.Color(153, 153, 153));
+        lblFullName3.setText("NGUYEN THIEN NHAN");
 
         javax.swing.GroupLayout pnlTopLayout = new javax.swing.GroupLayout(pnlTop);
         pnlTop.setLayout(pnlTopLayout);
@@ -173,11 +244,11 @@ public class FormCustomer extends javax.swing.JFrame {
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)))
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblAccNumber3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblBalance3, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)))
+                    .addComponent(lblFullName3, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btReset3)
                 .addGap(16, 16, 16))
         );
         pnlTopLayout.setVerticalGroup(
@@ -186,20 +257,20 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlTopLayout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1))
+                        .addComponent(btReset3))
                     .addGroup(pnlTopLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblFullName3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1)
                             .addGroup(pnlTopLayout.createSequentialGroup()
                                 .addGap(2, 2, 2)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                                .addComponent(lblAccNumber3, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(lblBalance3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -318,9 +389,9 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlLogoutLayout.setVerticalGroup(
             pnlLogoutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlLogoutLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(30, 30, 30)
                 .addComponent(btLogout)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         lblLineCol2.setBackground(new java.awt.Color(0, 0, 0));
@@ -334,33 +405,289 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.setLayout(new java.awt.CardLayout());
 
+        pnlCardProfile.setName(""); // NOI18N
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Information", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel7.setText("Fullname");
+
+        txtFullName3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFullName3FocusLost(evt);
+            }
+        });
+        txtFullName3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFullName3ActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel8.setText("Email");
+
+        jLabel11.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel11.setText("Day");
+
+        jLabel12.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel12.setText("Month");
+
+        jLabel13.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel13.setText("Year");
+
+        fieldDay3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
+        fieldDay3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldDay3FocusLost(evt);
+            }
+        });
+
+        fieldMonth3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        fieldMonth3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldMonth3FocusLost(evt);
+            }
+        });
+
+        fieldYear3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910", "1911", "1912", "1913", "1914", "1915", "1916", "1917", "1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970", "1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        fieldYear3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldYear3FocusLost(evt);
+            }
+        });
+
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel14.setText("Gender");
+
+        GenderGroup3.add(btMale3);
+        btMale3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btMale3.setForeground(new java.awt.Color(178, 137, 145));
+        btMale3.setSelected(true);
+        btMale3.setText("Male");
+
+        GenderGroup3.add(btFemale3);
+        btFemale3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btFemale3.setForeground(new java.awt.Color(178, 137, 145));
+        btFemale3.setText("Female");
+
+        btSaveInfo3.setBackground(new java.awt.Color(153, 255, 255));
+        btSaveInfo3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btSaveInfo3.setForeground(new java.awt.Color(178, 137, 145));
+        btSaveInfo3.setText("Save ");
+
+        lblEmail3.setBackground(new java.awt.Color(255, 255, 255));
+        lblEmail3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblEmail3.setForeground(new java.awt.Color(178, 137, 145));
+        lblEmail3.setToolTipText("");
+        lblEmail3.setOpaque(true);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldDay3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(22, 22, 22)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldMonth3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(47, 47, 47)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(fieldYear3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(btMale3, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btFemale3, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(116, 116, 116))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtFullName3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7))
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(240, 240, 240))
+                            .addComponent(lblEmail3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btSaveInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtFullName3, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                    .addComponent(lblEmail3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel13)
+                    .addComponent(jLabel14))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fieldDay3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldMonth3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldYear3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btMale3)
+                    .addComponent(btFemale3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addComponent(btSaveInfo3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        fieldYear3.setSelectedIndex(105);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Password", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        btEyePass3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/seenEye.png"))); // NOI18N
+        btEyePass3.setContentAreaFilled(false);
+        btEyePass3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btEyePass3ActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel9.setText("Password");
+
+        txtPassword3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPassword3FocusLost(evt);
+            }
+        });
+
+        txtConfirmPass3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtConfirmPass3FocusLost(evt);
+            }
+        });
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel10.setText("Confirm Password");
+
+        btChangePass3.setBackground(new java.awt.Color(153, 255, 255));
+        btChangePass3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btChangePass3.setForeground(new java.awt.Color(178, 137, 145));
+        btChangePass3.setText("Change Password");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(txtConfirmPass3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(txtPassword3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btEyePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel10)
+                    .addComponent(btChangePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(247, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtPassword3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btEyePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtConfirmPass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btChangePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnlCardProfileLayout = new javax.swing.GroupLayout(pnlCardProfile);
+        pnlCardProfile.setLayout(pnlCardProfileLayout);
+        pnlCardProfileLayout.setHorizontalGroup(
+            pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardProfileLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+        pnlCardProfileLayout.setVerticalGroup(
+            pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardProfileLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        pnlCard.add(pnlCardProfile, "Profile");
+
         javax.swing.GroupLayout pnlCardHistoryLayout = new javax.swing.GroupLayout(pnlCardHistory);
         pnlCardHistory.setLayout(pnlCardHistoryLayout);
         pnlCardHistoryLayout.setHorizontalGroup(
             pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 565, Short.MAX_VALUE)
+            .addGap(0, 592, Short.MAX_VALUE)
         );
         pnlCardHistoryLayout.setVerticalGroup(
             pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 451, Short.MAX_VALUE)
+            .addGap(0, 489, Short.MAX_VALUE)
         );
 
-        pnlCard.add(pnlCardHistory, "card3");
+        pnlCard.add(pnlCardHistory, "History");
 
-        pnlCardTransfer.setName("Transfer"); // NOI18N
+        pnlCardTransfer.setName(""); // NOI18N
 
         javax.swing.GroupLayout pnlCardTransferLayout = new javax.swing.GroupLayout(pnlCardTransfer);
         pnlCardTransfer.setLayout(pnlCardTransferLayout);
         pnlCardTransferLayout.setHorizontalGroup(
             pnlCardTransferLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 565, Short.MAX_VALUE)
+            .addGap(0, 592, Short.MAX_VALUE)
         );
         pnlCardTransferLayout.setVerticalGroup(
             pnlCardTransferLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 451, Short.MAX_VALUE)
+            .addGap(0, 489, Short.MAX_VALUE)
         );
 
-        pnlCard.add(pnlCardTransfer, "card2");
+        pnlCard.add(pnlCardTransfer, "Transfer");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -370,7 +697,7 @@ public class FormCustomer extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(pnlLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                     .addComponent(lblProfile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btSetingPF, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblLineRow2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -383,16 +710,15 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblLineCol2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 565, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblProfile)
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, 0)
                         .addComponent(btSetingPF))
                     .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblLineCol1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -400,15 +726,16 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addComponent(lblLineRow1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(lblLineRow2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(pnlLogout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(lblLineCol2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
 
         pack();
@@ -416,14 +743,18 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btSetingPFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSetingPFActionPerformed
         // TODO add your handling code here:
+        resetAccountInfo();
+        cardLayout3.show(pnlCard, "Profile");
     }//GEN-LAST:event_btSetingPFActionPerformed
 
     private void btHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btHistoryActionPerformed
         // TODO add your handling code here:
+        cardLayout3.show(pnlCard, "History");
     }//GEN-LAST:event_btHistoryActionPerformed
 
     private void btTransActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTransActionPerformed
         // TODO add your handling code here:
+        cardLayout3.show(pnlCard, "Transfer");
     }//GEN-LAST:event_btTransActionPerformed
 
     private void btWithDrawActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWithDrawActionPerformed
@@ -455,6 +786,96 @@ public class FormCustomer extends javax.swing.JFrame {
         btLogout.setIcon(logoutStatic);
     }//GEN-LAST:event_btLogoutMouseExited
 
+    private void txtFullName3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName3FocusLost
+        // TODO add your handling code here:
+        txtFullName3.setText(txtFullName3.getText().trim());
+        if(txtFullName3.getText().isEmpty()){
+            txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtFullName3FocusLost
+
+    private void fieldDay3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldDay3FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay3.getSelectedItem().toString() + "/"
+        + fieldMonth3.getSelectedItem().toString() + "/"
+        + fieldYear3.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay3.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth3.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear3.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldDay3FocusLost
+
+    private void fieldMonth3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldMonth3FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay3.getSelectedItem().toString() + "/"
+        + fieldMonth3.getSelectedItem().toString() + "/"
+        + fieldYear3.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay3.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth3.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear3.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldMonth3FocusLost
+
+    private void fieldYear3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldYear3FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay3.getSelectedItem().toString() + "/"
+        + fieldMonth3.getSelectedItem().toString() + "/"
+        + fieldYear3.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay3.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth3.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear3.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldYear3FocusLost
+
+    private void btEyePass3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEyePass3ActionPerformed
+        // TODO add your handling code here:
+        if(isOpenEye3){
+            txtPassword3.setEchoChar('•');
+            btEyePass3.setIcon(closeEyeImage);
+            isOpenEye3 = false;
+        }
+        else{
+            txtPassword3.setEchoChar((char) 0);
+            btEyePass3.setIcon(openEyeImage);
+            isOpenEye3 = true;
+        }
+    }//GEN-LAST:event_btEyePass3ActionPerformed
+
+    private void txtPassword3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPassword3FocusLost
+        // TODO add your handling code here:
+        txtPassword3.setText(txtPassword3.getText().trim());
+        if(txtPassword3.getText().isEmpty()){
+            txtPassword3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtPassword3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtPassword3FocusLost
+
+    private void txtConfirmPass3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtConfirmPass3FocusLost
+        // TODO add your handling code here:
+        txtConfirmPass3.setText(txtConfirmPass3.getText().trim());
+        if(txtConfirmPass3.getText().isEmpty()){
+            txtConfirmPass3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtConfirmPass3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtConfirmPass3FocusLost
+
+    private void btReset3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btReset3ActionPerformed
+        // TODO add your handling code here:
+        myAccount = controller.getAccount(myEmail, "Customer");
+        resetAccountInfo();
+    }//GEN-LAST:event_btReset3ActionPerformed
+
+    private void txtFullName3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullName3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFullName3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -477,24 +898,46 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FormCustomer().setVisible(true));
+        String email = "nhanprovip37@gmail.com";
+        
+        java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup GenderGroup3;
+    private javax.swing.JButton btChangePass3;
     private javax.swing.JButton btDeposit;
+    private javax.swing.JButton btEyePass3;
+    private javax.swing.JRadioButton btFemale3;
     private javax.swing.JButton btHistory;
     private javax.swing.JButton btHome;
     private javax.swing.JButton btLogout;
+    private javax.swing.JRadioButton btMale3;
+    private javax.swing.JButton btReset3;
+    private javax.swing.JButton btSaveInfo3;
     private javax.swing.JButton btSetingPF;
     private javax.swing.JButton btStatics;
     private javax.swing.JButton btTrans;
     private javax.swing.JButton btWithDraw;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> fieldDay3;
+    private javax.swing.JComboBox<String> fieldMonth3;
+    private javax.swing.JComboBox<String> fieldYear3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblAccNumber3;
+    private javax.swing.JLabel lblBalance3;
+    private javax.swing.JLabel lblEmail3;
+    private javax.swing.JLabel lblFullName3;
     private javax.swing.JLabel lblLineCol1;
     private javax.swing.JLabel lblLineCol2;
     private javax.swing.JLabel lblLineRow1;
@@ -502,9 +945,13 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel lblProfile;
     private javax.swing.JPanel pnlCard;
     private javax.swing.JPanel pnlCardHistory;
+    private javax.swing.JPanel pnlCardProfile;
     private javax.swing.JPanel pnlCardTransfer;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
     private javax.swing.JPanel pnlTop;
+    private javax.swing.JPasswordField txtConfirmPass3;
+    private javax.swing.JTextField txtFullName3;
+    private javax.swing.JPasswordField txtPassword3;
     // End of variables declaration//GEN-END:variables
 }

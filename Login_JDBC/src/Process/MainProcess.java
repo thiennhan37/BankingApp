@@ -5,28 +5,18 @@
 package Process;
 
 import Database.MyDatabase;
+import View.FormLogin;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MainProcess {
 
-    public static void main(String args[]) throws SQLException {
-        Connection c = MyDatabase.getConnection();
-        // MyDatabase.printInfo(c);
-                
-        try {
-            Statement statement = c.createStatement();
-            String sqlCommand = "Insert into accounts "
-                    + "values ('nhan37@gmail.com', 'nhan37')";
-            int check = statement.executeUpdate(sqlCommand);
-            System.out.println(check);
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public static void main(String args[]){
+        String emailForLogin = null; 
+        FormLogin formLogin = new FormLogin();
+        formLogin.setVisible(true);
         
-        
-        MyDatabase.closeConnection(c);
+         
     }
 }

@@ -13,6 +13,7 @@ import Model.Customer;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import java.awt.*;
 import javax.swing.*;
+import View.FormCustomer;
 
 /**
  *
@@ -605,7 +606,7 @@ public class FormLogin extends javax.swing.JFrame {
         if(!new OTPDialog(this, email).isMatch()){
             return;
         }
-        Account ac = new Customer(fullName, email, pass, gender, birthDay, true , 0.0);
+        Account ac = new Customer(fullName.toUpperCase(), email, pass, gender, birthDay, true , 0.0);
         controller.addAccount(ac);
         JOptionPane.showMessageDialog(this, "Register completely", "", JOptionPane.INFORMATION_MESSAGE);
         cardLayout.show(pnlCardBegin, "cardLogin");
@@ -734,8 +735,10 @@ public class FormLogin extends javax.swing.JFrame {
             clearWarning.start();
             return;
         }
-        JOptionPane.showMessageDialog(this, "login successfully", "", JOptionPane.INFORMATION_MESSAGE);
-        // this.dispose();
+        // JOptionPane.showMessageDialog(this, "login successfully", "", JOptionPane.INFORMATION_MESSAGE);
+        this.dispose();
+        new FormCustomer(email).setVisible(true);
+         
     }//GEN-LAST:event_btLogin1ActionPerformed
 
     /**
