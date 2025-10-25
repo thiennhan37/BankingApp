@@ -113,29 +113,24 @@ public class AccountDAO implements DAOInterface<Account>{
     }
 
     @Override
-    public int updateObject(Account ac) {
+    public void updateObjectInfor(Account ac) {
         Connection connect = MyDatabase.getConnection();
-        int result = 0;
-        return result;
-    }
-
-    @Override
-    public ArrayList<Account> showAll() {
-        Connection connect = MyDatabase.getConnection();
-        ArrayList<Account> resultArray = new ArrayList<>();
         try{
-            String command = "select * from accounts";
-            PreparedStatement state = connect.prepareStatement(command);
-            ResultSet result = state.executeQuery(command);
-            while(result.next()){
-            }
+            String command = "UPDATE accounts SET fullName = ?, "
+                    + "gender = ?, birthDay = ? WHERE id = ?";
+            PreparedStatement statement = connect.prepareStatement(command);
+            statement.setString(1, ac.getFullName());
+            statement.setString(2, ac.getGender());
+            statement.setDate(3, java.sql.Date.valueOf(ac.getBirthDay()));
+            statement.setString(4, ac.getId());
+            statement.executeUpdate();
         }
         catch(SQLException e){
             e.printStackTrace();
         }
-        MyDatabase.closeConnection(connect);
-        return resultArray;
+        MyDatabase.closeConnection(connect); 
     }
+
 
     @Override
     public Account getObject(String email, String type) {
@@ -166,10 +161,45 @@ public class AccountDAO implements DAOInterface<Account>{
         catch(SQLException e){
             e.printStackTrace();
         }
+        MyDatabase.closeConnection(connect);
         return ac;
     }
 
+    @Override
+    public void updateObjectPass(Account ac) {
+        Connection connect = MyDatabase.getConnection();
+        try{
+            String command = "UPDATE accounts SET password = ? "
+                    + "WHERE id = ?";
+            PreparedStatement statement = connect.prepareStatement(command);
+            statement.setString(1, ac.getPassword());
+            statement.setString(2, ac.getId());
+            statement.executeUpdate(); 
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        MyDatabase.closeConnection(connect); 
+    }
+
     
+    @Override
+    public ArrayList<Account> showAll() {
+        Connection connect = MyDatabase.getConnection();
+        ArrayList<Account> resultArray = new ArrayList<>();
+        try{
+            String command = "select * from accounts";
+            PreparedStatement state = connect.prepareStatement(command);
+            ResultSet result = state.executeQuery(command);
+            while(result.next()){
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        MyDatabase.closeConnection(connect);
+        return resultArray;
+    }
 
     
 }

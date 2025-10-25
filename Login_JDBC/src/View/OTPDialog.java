@@ -28,7 +28,7 @@ public class OTPDialog extends JDialog{
     private String serverOTP;
     private boolean match;
     private Timer ttl;
-    public OTPDialog(JFrame par, String toEmail) {
+    public OTPDialog(JFrame par, String toEmail, String typeMess) {
         super(par, "Verify OTP", true);
         setSize(400, 150);
         setResizable(false);
@@ -65,7 +65,7 @@ public class OTPDialog extends JDialog{
 
         
         
-        serverOTP = SendMail.sendVerificationCode(toEmail);
+        serverOTP = SendMail.sendVerificationCode(toEmail, typeMess);
         ttl = new Timer(1 * 60 * 1000, lbd -> serverOTP = null);
         ttl.setRepeats(false);
         ttl.start();
@@ -84,7 +84,7 @@ public class OTPDialog extends JDialog{
         
         resendButton.addActionListener(e -> {
             resendButton.setEnabled(false);
-            serverOTP = SendMail.sendVerificationCode(toEmail);
+            serverOTP = SendMail.sendVerificationCode(toEmail, typeMess);
             if(ttl != null) ttl.stop();
             ttl = new Timer(1 * 60 * 1000, lbd -> serverOTP = null);
             ttl.setRepeats(false);

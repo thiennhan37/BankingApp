@@ -10,8 +10,10 @@ package Process;
  * toi uu hien thi nhanh khi register
  * đơ UI khi bấm resend
  */
+import Control.AccountControl;
 import Model.Account;
 import DAO.AccountDAO;
+import Model.Customer;
 import View.OTPDialog;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import View.OTPDialog;
 import com.formdev.flatlaf.FlatDarculaLaf;
+import java.time.LocalDate;
 
 public class testAccount {
 
@@ -47,15 +50,13 @@ public class testAccount {
 //        UIManager.put("Button.background", Color.WHITE); // màu xanh Google
 //        UIManager.put("Button.foreground", Color.BLACK);
 
-        JFrame x = new JFrame();
-//       
-//        new OTPDialog(new JFrame(), "abbc"); 
-//        System.exit(0); 
-        // Icon errorIcon = new FlatSVGIcon("src/MyImage/error_x.svg", 32, 32);
-
-        x.setLocationRelativeTo(null);
-        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        x.setVisible(true);
+//        JFrame x = new JFrame();  
+//        x.setLocationRelativeTo(null);
+//        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        x.setVisible(true);
+        LocalDate date = LocalDate.parse("2005-07-03");
+        Account ac = new Customer("999007", "ac", "ac", "nhanthien", "Male", date , true, 0.00);
+        AccountDAO.getInstance().updateObjectPass(ac);
         
     }
 }

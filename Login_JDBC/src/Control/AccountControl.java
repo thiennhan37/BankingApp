@@ -37,4 +37,10 @@ public class AccountControl {
     public Account getAccount(String email, String type){
         return accountDAO.getObject(email, type);
     }
+    public void updateObjectInfor(Account ac){
+        accountDAO.updateObjectInfor(ac);
+    }
+    public void updateObjectPass(Account ac){
+        accountDAO.updateObjectPass(ac); 
+    }
 }

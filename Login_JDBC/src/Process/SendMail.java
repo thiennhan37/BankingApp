@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.Random;
 
 public class SendMail {
-    public static String sendVerificationCode(String toEmail) {
+    public static String sendVerificationCode(String toEmail, String typeMess) {
         // 1. Sinh mã 6 chữ số ngẫu nhiên
         Random random = new Random();
         String code = String.format("%06d", random.nextInt(999999));
@@ -39,7 +39,7 @@ public class SendMail {
             message.setFrom(new InternetAddress(fromEmail, "Banking App")); // tên hiển thị
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("Mã xác nhận từ Banking App");
-            message.setText("Xin chào,\n\nMã xác nhận của bạn là: " + code + 
+            message.setText("Xin chào,\n\nMã " + typeMess + " của bạn là: " + code + 
                             "\nMã này có hiệu lực trong 5 phút.\n\nTrân trọng,\nBanking App Team");
 
             // 6. Gửi mail

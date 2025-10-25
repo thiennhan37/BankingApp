@@ -15,10 +15,13 @@ import java.util.ArrayList;
 public interface DAOInterface<T> {
     public int addObject(T t);
     public int deleteObject(T t);
-    public int updateObject(T t);
+    public void updateObjectInfor(T t);
+    public void updateObjectPass(T t);
+            
     public int countObjects(String type);
     public T getObject(String email, String type);
     public boolean checkExistObject(String email);
+    
     public ArrayList<Account> showAll();
 
 }

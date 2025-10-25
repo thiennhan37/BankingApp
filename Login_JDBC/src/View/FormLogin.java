@@ -267,6 +267,11 @@ public class FormLogin extends javax.swing.JFrame {
                 txtFullName2FocusLost(evt);
             }
         });
+        txtFullName2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFullName2ActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(178, 137, 145));
@@ -587,6 +592,10 @@ public class FormLogin extends javax.swing.JFrame {
             lblWarn2.setText("Invalid email address");
             return;
         }
+        if(pass.length() < 6){
+            lblWarn2.setText("Password must be at least 6 characters long");
+            return;
+        }
         if(pass.isEmpty()){
             txtPassword2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
             return;
@@ -603,10 +612,10 @@ public class FormLogin extends javax.swing.JFrame {
             lblWarn2.setText("Account already exists");
             return;
         }
-        if(!new OTPDialog(this, email).isMatch()){
+        if(!new OTPDialog(this, email, "xác thực tài khoản").isMatch()){
             return;
         }
-        Account ac = new Customer(fullName.toUpperCase(), email, pass, gender, birthDay, true , 0.0);
+        Account ac = new Customer(fullName, email, pass, gender, birthDay, true , 0.0);
         controller.addAccount(ac);
         JOptionPane.showMessageDialog(this, "Register completely", "", JOptionPane.INFORMATION_MESSAGE);
         cardLayout.show(pnlCardBegin, "cardLogin");
@@ -619,7 +628,7 @@ public class FormLogin extends javax.swing.JFrame {
 
     private void txtFullName2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName2FocusLost
         // TODO add your handling code here:
-        txtFullName2.setText(txtFullName2.getText().trim());
+        txtFullName2.setText(txtFullName2.getText().trim().toUpperCase());
         if(txtFullName2.getText().isEmpty()){
             txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
@@ -740,6 +749,10 @@ public class FormLogin extends javax.swing.JFrame {
         new FormCustomer(email).setVisible(true);
          
     }//GEN-LAST:event_btLogin1ActionPerformed
+
+    private void txtFullName2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullName2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFullName2ActionPerformed
 
     /**
      * @param args the command line arguments

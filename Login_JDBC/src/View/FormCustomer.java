@@ -6,6 +6,7 @@ package View;
 
 import Control.AccountControl;
 import Model.Account;
+import Process.SendMail;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -194,6 +195,7 @@ public class FormCustomer extends javax.swing.JFrame {
         txtConfirmPass3 = new javax.swing.JPasswordField();
         jLabel10 = new javax.swing.JLabel();
         btChangePass3 = new javax.swing.JButton();
+        lblWarnSavePass3 = new javax.swing.JLabel();
         pnlCardHistory = new javax.swing.JPanel();
         pnlCardTransfer = new javax.swing.JPanel();
 
@@ -484,6 +486,11 @@ public class FormCustomer extends javax.swing.JFrame {
         btSaveInfo3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btSaveInfo3.setForeground(new java.awt.Color(178, 137, 145));
         btSaveInfo3.setText("Save ");
+        btSaveInfo3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btSaveInfo3ActionPerformed(evt);
+            }
+        });
 
         lblEmail3.setBackground(new java.awt.Color(255, 255, 255));
         lblEmail3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -580,7 +587,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(178, 137, 145));
-        jLabel9.setText("Password");
+        jLabel9.setText("New Password");
 
         txtPassword3.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -596,12 +603,19 @@ public class FormCustomer extends javax.swing.JFrame {
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(178, 137, 145));
-        jLabel10.setText("Confirm Password");
+        jLabel10.setText("Confirm New Password");
 
         btChangePass3.setBackground(new java.awt.Color(153, 255, 255));
         btChangePass3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btChangePass3.setForeground(new java.awt.Color(178, 137, 145));
         btChangePass3.setText("Change Password");
+        btChangePass3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btChangePass3ActionPerformed(evt);
+            }
+        });
+
+        lblWarnSavePass3.setForeground(new java.awt.Color(255, 51, 51));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -611,31 +625,35 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel9)
-                    .addComponent(txtConfirmPass3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(txtPassword3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btEyePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel10)
-                    .addComponent(btChangePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(btChangePass3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblWarnSavePass3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtConfirmPass3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)))
                 .addContainerGap(247, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addGap(12, 12, 12)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtPassword3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btEyePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btEyePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPassword3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtConfirmPass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblWarnSavePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btChangePass3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout pnlCardProfileLayout = new javax.swing.GroupLayout(pnlCardProfile);
@@ -656,7 +674,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pnlCard.add(pnlCardProfile, "Profile");
@@ -788,7 +806,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void txtFullName3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName3FocusLost
         // TODO add your handling code here:
-        txtFullName3.setText(txtFullName3.getText().trim());
+        txtFullName3.setText(txtFullName3.getText().trim().toUpperCase());
         if(txtFullName3.getText().isEmpty()){
             txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
@@ -876,6 +894,61 @@ public class FormCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFullName3ActionPerformed
 
+    private void btSaveInfo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaveInfo3ActionPerformed
+        // TODO add your handling code here:
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to save these changes?", 
+                "Confirm Save Information", 
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if(choice == 0){
+            myAccount.setFullName(txtFullName3.getText().toUpperCase());
+            String date = fieldDay3.getSelectedItem().toString() + "/"
+                    + fieldMonth3.getSelectedItem().toString() + "/"
+                    + fieldYear3.getSelectedItem().toString();
+            myAccount.setBirthDay(LocalDate.parse(date, DateTimeFormatter.ofPattern("d/M/yyyy")));  
+            if(btMale3.isSelected()) myAccount.setGender("Male");
+            else myAccount.setGender("Female");
+            
+            controller.updateObjectInfor(myAccount);
+        }
+        
+    }//GEN-LAST:event_btSaveInfo3ActionPerformed
+
+    private void btChangePass3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btChangePass3ActionPerformed
+        // TODO add your handling code here:
+        lblWarnSavePass3.setText(""); 
+        String oldPass = myAccount.getPassword();
+        String newPass = txtPassword3.getText().trim();
+        String confirmNewPass = txtConfirmPass3.getText().trim();
+        if(newPass.isEmpty() || confirmNewPass.isEmpty()) return;
+        if(newPass.length() < 6){
+            lblWarnSavePass3.setText("Password must be at least 6 characters long");
+            return;
+        }
+        if(newPass.equals(oldPass)){
+            lblWarnSavePass3.setText("New password cannot be the same as the old password");
+            return;
+        }
+        if(!newPass.equals(confirmNewPass)){
+            lblWarnSavePass3.setText("Password does not match");
+            return;
+        }
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to change password?", 
+                "Confirm Save Password", 
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if(choice == 0){
+            if(new OTPDialog(this, myEmail, "xác nhận đổi mật khẩu").isMatch()){
+                myAccount.setPassword(newPass); 
+                controller.updateObjectPass(myAccount);
+                JOptionPane.showMessageDialog(this, "Password changed successfully", "", 
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "", "", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+
+    }//GEN-LAST:event_btChangePass3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -943,6 +1016,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel lblLineRow1;
     private javax.swing.JLabel lblLineRow2;
     private javax.swing.JLabel lblProfile;
+    private javax.swing.JLabel lblWarnSavePass3;
     private javax.swing.JPanel pnlCard;
     private javax.swing.JPanel pnlCardHistory;
     private javax.swing.JPanel pnlCardProfile;
