@@ -55,7 +55,7 @@ public class testAccount {
 //        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        x.setVisible(true);
         LocalDate date = LocalDate.parse("2005-07-03");
-        Account ac = new Customer("999007", "ac", "ac", "nhanthien", "Male", date , true, 0.00);
+        Account ac = new Customer("999007", "ac", "ac", "nhanthien", "Male", date , true, (long)0);
         AccountDAO.getInstance().updateObjectPass(ac);
         
     }

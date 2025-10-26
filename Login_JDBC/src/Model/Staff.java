@@ -30,7 +30,7 @@ public class Staff extends Account{
         return "Staff";
     }
     @Override
-    public Double getBalace() {
+    public Long getBalace() {
         return null;
     }
     @Override

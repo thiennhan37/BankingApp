@@ -44,7 +44,7 @@ public class AccountDAO implements DAOInterface<Account>{
             statement.setDate(6, java.sql.Date.valueOf(ac.getBirthDay()));
             statement.setBoolean(7, ac.isActive());
             statement.setString(8, ac.getType());
-            statement.setDouble(9, ac.getBalace());
+            statement.setLong(9, ac.getBalace());
             statement.setString(10, ac.getBranch());
             result = statement.executeUpdate();
         }
@@ -133,7 +133,7 @@ public class AccountDAO implements DAOInterface<Account>{
 
 
     @Override
-    public Account getObject(String email, String type) {
+    public Account getObjectByEmail(String email, String type) {
         Connection connect = MyDatabase.getConnection();
         Account ac  = null; 
         String id, fullName, password, gender;
@@ -143,14 +143,19 @@ public class AccountDAO implements DAOInterface<Account>{
             String command = "SELECT * FROM accounts WHERE email = ?";
             PreparedStatement statement = connect.prepareStatement(command);
             statement.setString(1, email);
-            ResultSet rs = statement.executeQuery(); rs.next();
+            ResultSet rs = statement.executeQuery(); 
+            if(rs.next() == false){
+                // System.out.println("nhan");
+                return ac;
+            }
+            // rs.next();
             id = rs.getString("id"); 
             fullName = rs.getString("fullName");
             password = rs.getString("password"); gender = rs.getString("gender");
             birthDay = rs.getDate("birthDay").toLocalDate();
             active = rs.getBoolean("active");
             if(type.equals("Customer")){
-                Double balance = rs.getDouble("balance");
+                Long balance = rs.getLong("balance");
                 ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
             }
             else if(type.equals("Staff")){
@@ -199,6 +204,42 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         MyDatabase.closeConnection(connect);
         return resultArray;
+    }
+
+    @Override
+    public Account getObjectByID(String id, String type) {
+        Connection connect = MyDatabase.getConnection();
+        Account ac  = null; 
+        String email, fullName, password, gender;
+        LocalDate birthDay;
+        boolean active;
+        try{
+            String command = "SELECT * FROM accounts WHERE id = ?";
+            PreparedStatement statement = connect.prepareStatement(command);
+            statement.setString(1, id);
+            ResultSet rs = statement.executeQuery(); 
+            if(rs.next() == false){
+                return ac;
+            }
+            fullName = rs.getString("fullName");
+            password = rs.getString("password"); gender = rs.getString("gender");
+            birthDay = rs.getDate("birthDay").toLocalDate();
+            active = rs.getBoolean("active");
+            email = rs.getString("email");
+            if(type.equals("Customer")){
+                Long balance = rs.getLong("balance");
+                ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
+            }
+            else if(type.equals("Staff")){
+                String branch = rs.getString("branch");
+                ac = new Staff(id, fullName, email, password, gender, birthDay, active, branch);
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        MyDatabase.closeConnection(connect);
+        return ac;
     }
 
     

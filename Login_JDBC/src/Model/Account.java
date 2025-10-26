@@ -26,7 +26,7 @@ public abstract class Account {
         this.active = active;
     }
     public abstract String getType();
-    public abstract Double getBalace();
+    public abstract Long getBalace();
     public abstract String getBranch();
     
     public void Login(){

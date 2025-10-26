@@ -615,7 +615,7 @@ public class FormLogin extends javax.swing.JFrame {
         if(!new OTPDialog(this, email, "xác thực tài khoản").isMatch()){
             return;
         }
-        Account ac = new Customer(fullName, email, pass, gender, birthDay, true , 0.0);
+        Account ac = new Customer(fullName, email, pass, gender, birthDay, true , (long)0);
         controller.addAccount(ac);
         JOptionPane.showMessageDialog(this, "Register completely", "", JOptionPane.INFORMATION_MESSAGE);
         cardLayout.show(pnlCardBegin, "cardLogin");
@@ -737,7 +737,7 @@ public class FormLogin extends javax.swing.JFrame {
             txtPassword1.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
             return;
         }
-        if(!controller.checkValidAccount(email, password)){
+        if(controller.getAccountByEmail(email, "Customer") != null){
             lblWarn1.setText("Wrong Email Or Password");
             Timer clearWarning = new Timer(1000, e -> lblWarn1.setText(""));
             clearWarning.setRepeats(false);

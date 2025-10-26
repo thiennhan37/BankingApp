@@ -14,13 +14,13 @@ import java.time.LocalDate;
 public class Customer extends Account{
     
     public static int number  = AccountDAO.getInstance().countObjects("Customer");
-    private Double balance;
-    public Customer(String fullName, String email, String password, String gender, LocalDate birthDay, boolean isActive, Double balance) {
+    private Long balance;
+    public Customer(String fullName, String email, String password, String gender, LocalDate birthDay, boolean isActive, Long balance) {
         super(fullName, email, password, gender, birthDay, isActive);
         this.balance = balance;
         this.id = "999" + String.format("%03d", ++number);
     }
-    public Customer(String id, String fullName, String email, String password, String gender, LocalDate birthDay, boolean isActive, Double balance) {
+    public Customer(String id, String fullName, String email, String password, String gender, LocalDate birthDay, boolean isActive, Long balance) {
         super(fullName, email, password, gender, birthDay, isActive);
         this.balance = balance;
         this.id = id;
@@ -28,7 +28,7 @@ public class Customer extends Account{
     @Override
     public String getType() { return "Customer"; }
     @Override
-    public Double getBalace() { return balance; }
+    public Long getBalace() { return balance; }
     @Override
     public String getBranch() { return null; }
     
