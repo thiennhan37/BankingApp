@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -100,7 +101,7 @@ public class FormCustomer extends javax.swing.JFrame {
     }   
     
     private void setMouseList(){
-        JButton[] arr = {btHome, btHistory, btTrans, btWithDraw, btDeposit, btStatics, btLogout};
+        JButton[] arr = {btHome, btHistory, btTransfer, btMoney, btProfile, btStatics, btLogout};
         
         for(int i = 0; i < arr.length; i++){
             JButton x = arr[i];
@@ -291,13 +292,12 @@ public class FormCustomer extends javax.swing.JFrame {
         lblFullName3 = new javax.swing.JLabel();
         pnlMenu = new javax.swing.JPanel();
         btHome = new javax.swing.JButton();
+        btProfile = new javax.swing.JButton();
+        btTransfer = new javax.swing.JButton();
+        btMoney = new javax.swing.JButton();
         btHistory = new javax.swing.JButton();
-        btTrans = new javax.swing.JButton();
-        btWithDraw = new javax.swing.JButton();
-        btDeposit = new javax.swing.JButton();
         btStatics = new javax.swing.JButton();
         lblProfile = new javax.swing.JLabel();
-        btSetingPF = new javax.swing.JButton();
         lblLineRow1 = new javax.swing.JLabel();
         pnlLogout = new javax.swing.JPanel();
         btLogout = new javax.swing.JButton();
@@ -345,6 +345,8 @@ public class FormCustomer extends javax.swing.JFrame {
         txtTransDescription = new javax.swing.JTextField();
         txtTransTo = new javax.swing.JFormattedTextField();
         btTransfer3 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -367,6 +369,8 @@ public class FormCustomer extends javax.swing.JFrame {
         lblAccNumber3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblAccNumber3.setForeground(new java.awt.Color(255, 255, 255));
         lblAccNumber3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblAccNumber3.setText("999999");
+        lblAccNumber3.setToolTipText("");
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(102, 102, 102));
@@ -375,6 +379,7 @@ public class FormCustomer extends javax.swing.JFrame {
         lblBalance3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblBalance3.setForeground(new java.awt.Color(255, 255, 255));
         lblBalance3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblBalance3.setText("1000000000");
 
         lblFullName3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblFullName3.setForeground(new java.awt.Color(153, 153, 153));
@@ -412,10 +417,8 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addComponent(lblFullName3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel1)
-                            .addGroup(pnlTopLayout.createSequentialGroup()
-                                .addGap(2, 2, 2)
-                                .addComponent(lblAccNumber3, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblAccNumber3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -437,6 +440,42 @@ public class FormCustomer extends javax.swing.JFrame {
         });
         pnlMenu.add(btHome);
 
+        btProfile.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btProfile.setForeground(new java.awt.Color(51, 51, 51));
+        btProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Information.png"))); // NOI18N
+        btProfile.setText("  Profile");
+        btProfile.setBorderPainted(false);
+        btProfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btProfileActionPerformed(evt);
+            }
+        });
+        pnlMenu.add(btProfile);
+
+        btTransfer.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btTransfer.setForeground(new java.awt.Color(51, 51, 51));
+        btTransfer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/transfer.png"))); // NOI18N
+        btTransfer.setText(" Transfer ");
+        btTransfer.setBorderPainted(false);
+        btTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btTransferActionPerformed(evt);
+            }
+        });
+        pnlMenu.add(btTransfer);
+
+        btMoney.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btMoney.setForeground(new java.awt.Color(51, 51, 51));
+        btMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/money.png"))); // NOI18N
+        btMoney.setText("  Money");
+        btMoney.setBorderPainted(false);
+        btMoney.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btMoneyActionPerformed(evt);
+            }
+        });
+        pnlMenu.add(btMoney);
+
         btHistory.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btHistory.setForeground(new java.awt.Color(51, 51, 51));
         btHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/bill.png"))); // NOI18N
@@ -454,37 +493,6 @@ public class FormCustomer extends javax.swing.JFrame {
         });
         pnlMenu.add(btHistory);
 
-        btTrans.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btTrans.setForeground(new java.awt.Color(51, 51, 51));
-        btTrans.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/trans.png"))); // NOI18N
-        btTrans.setText(" Transfer ");
-        btTrans.setBorderPainted(false);
-        btTrans.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btTransActionPerformed(evt);
-            }
-        });
-        pnlMenu.add(btTrans);
-
-        btWithDraw.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btWithDraw.setForeground(new java.awt.Color(51, 51, 51));
-        btWithDraw.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/withdraw.png"))); // NOI18N
-        btWithDraw.setText("  Withdraw");
-        btWithDraw.setBorderPainted(false);
-        btWithDraw.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btWithDrawActionPerformed(evt);
-            }
-        });
-        pnlMenu.add(btWithDraw);
-
-        btDeposit.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btDeposit.setForeground(new java.awt.Color(51, 51, 51));
-        btDeposit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/deposit.png"))); // NOI18N
-        btDeposit.setText(" Deposit ");
-        btDeposit.setBorderPainted(false);
-        pnlMenu.add(btDeposit);
-
         btStatics.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btStatics.setForeground(new java.awt.Color(51, 51, 51));
         btStatics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/statics.png"))); // NOI18N
@@ -496,25 +504,6 @@ public class FormCustomer extends javax.swing.JFrame {
         lblProfile.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/profile.png"))); // NOI18N
         lblProfile.setOpaque(true);
-
-        btSetingPF.setBackground(new java.awt.Color(153, 255, 255));
-        btSetingPF.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btSetingPF.setForeground(new java.awt.Color(51, 51, 51));
-        btSetingPF.setText("Setting Profile");
-        btSetingPF.setBorder(null);
-        btSetingPF.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btSetingPFMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btSetingPFMouseExited(evt);
-            }
-        });
-        btSetingPF.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btSetingPFActionPerformed(evt);
-            }
-        });
 
         lblLineRow1.setBackground(new java.awt.Color(0, 0, 0));
         lblLineRow1.setOpaque(true);
@@ -559,6 +548,8 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.setLayout(new java.awt.CardLayout());
 
+        pnlCardHome.setAlignmentX(0.0F);
+
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Giám đốc nhân sự 093 456 789 xinchao@trangwebhay.vn.gif"))); // NOI18N
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/ChucTet.png"))); // NOI18N
@@ -580,8 +571,9 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlCardHomeLayout.setVerticalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -968,19 +960,32 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardTransfer, "Transfer");
 
+        jLabel6.setBackground(new java.awt.Color(153, 255, 255));
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("9999@gmail.com");
+        jLabel6.setOpaque(true);
+
+        jLabel17.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel17.setOpaque(true);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlLogout, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblProfile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btSetingPF, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblLineRow2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, 0)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblLineRow2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblProfile, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblLineCol1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -989,20 +994,25 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblLineCol2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(0, 0, 0)
-                        .addComponent(btSetingPF))
-                    .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblLineCol1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, 0)
-                .addComponent(lblLineRow1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblLineCol1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(1, 1, 1)
+                        .addComponent(lblLineRow1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1024,18 +1034,18 @@ public class FormCustomer extends javax.swing.JFrame {
         cardLayout3.show(pnlCard, "History");
     }//GEN-LAST:event_btHistoryActionPerformed
 
-    private void btTransActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTransActionPerformed
+    private void btTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTransferActionPerformed
         // TODO add your handling code here:
         txtTransTo.setValue(null);
         txtTransAmount.setValue(null);
         txtTransDescription.setText(myAccount.getFullName() + " chuyen tien");
         lblToName.setText(""); 
         cardLayout3.show(pnlCard, "Transfer");
-    }//GEN-LAST:event_btTransActionPerformed
+    }//GEN-LAST:event_btTransferActionPerformed
 
-    private void btWithDrawActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWithDrawActionPerformed
+    private void btMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMoneyActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btWithDrawActionPerformed
+    }//GEN-LAST:event_btMoneyActionPerformed
 
     private void btHistoryFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_btHistoryFocusLost
         // TODO add your handling code here:
@@ -1202,22 +1212,6 @@ public class FormCustomer extends javax.swing.JFrame {
         cardLayout3.show(pnlCard, "Home");
     }//GEN-LAST:event_btHomeActionPerformed
 
-    private void btSetingPFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSetingPFActionPerformed
-        // TODO add your handling code here:
-        resetAccountInfo();
-        cardLayout3.show(pnlCard, "Profile");
-    }//GEN-LAST:event_btSetingPFActionPerformed
-
-    private void btSetingPFMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btSetingPFMouseExited
-        // TODO add your handling code here:
-        btSetingPF.setBackground(new Color(153,255,255));
-    }//GEN-LAST:event_btSetingPFMouseExited
-
-    private void btSetingPFMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btSetingPFMouseEntered
-        // TODO add your handling code here:
-        btSetingPF.setBackground(new Color(51,255,255));
-    }//GEN-LAST:event_btSetingPFMouseEntered
-
     private void txtTransAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTransAmountActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtTransAmountActionPerformed
@@ -1278,6 +1272,12 @@ public class FormCustomer extends javax.swing.JFrame {
         }       
     }//GEN-LAST:event_txtTransToFocusLost
 
+    private void btProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btProfileActionPerformed
+        // TODO add your handling code here:
+        resetAccountInfo();
+        cardLayout3.show(pnlCard, "Profile");
+    }//GEN-LAST:event_btProfileActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1308,23 +1308,22 @@ public class FormCustomer extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GenderGroup3;
     private javax.swing.JButton btChangePass3;
-    private javax.swing.JButton btDeposit;
     private javax.swing.JButton btEyePass3;
     private javax.swing.JRadioButton btFemale3;
     private javax.swing.JButton btHistory;
     private javax.swing.JButton btHome;
     private javax.swing.JButton btLogout;
     private javax.swing.JRadioButton btMale3;
+    private javax.swing.JButton btMoney;
+    private javax.swing.JButton btProfile;
     private javax.swing.JButton btReset3;
     private javax.swing.JButton btSATrans1;
     private javax.swing.JButton btSATrans2;
     private javax.swing.JButton btSATrans3;
     private javax.swing.JButton btSaveInfo3;
-    private javax.swing.JButton btSetingPF;
     private javax.swing.JButton btStatics;
-    private javax.swing.JButton btTrans;
+    private javax.swing.JButton btTransfer;
     private javax.swing.JButton btTransfer3;
-    private javax.swing.JButton btWithDraw;
     private javax.swing.JComboBox<String> fieldDay3;
     private javax.swing.JComboBox<String> fieldMonth3;
     private javax.swing.JComboBox<String> fieldYear3;
@@ -1336,10 +1335,12 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
