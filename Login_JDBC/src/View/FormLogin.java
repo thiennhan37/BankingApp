@@ -737,7 +737,8 @@ public class FormLogin extends javax.swing.JFrame {
             txtPassword1.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
             return;
         }
-        if(controller.getAccountByEmail(email, "Customer") != null){
+        Account ac = controller.getAccountByEmail(email);
+        if(ac == null){
             lblWarn1.setText("Wrong Email Or Password");
             Timer clearWarning = new Timer(1000, e -> lblWarn1.setText(""));
             clearWarning.setRepeats(false);
@@ -746,7 +747,9 @@ public class FormLogin extends javax.swing.JFrame {
         }
         // JOptionPane.showMessageDialog(this, "login successfully", "", JOptionPane.INFORMATION_MESSAGE);
         this.dispose();
-        new FormCustomer(email).setVisible(true);
+        if(ac.getType().equals("Customer")){
+            new FormCustomer(email).setVisible(true);
+        }
          
     }//GEN-LAST:event_btLogin1ActionPerformed
 

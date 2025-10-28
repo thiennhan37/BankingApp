@@ -5,6 +5,7 @@
 package View;
 
 import Control.AccountControl;
+import Control.TransactionControl;
 import Model.Account;
 import Process.SendMail;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -41,7 +42,8 @@ public class FormCustomer extends javax.swing.JFrame {
     /**
      * Creates new form FormCustomer
      */
-    private AccountControl controller;
+    private TransactionControl transController;
+    private AccountControl accController;
     private Account myAccount;
     private String myEmail;
     private CardLayout cardLayout3;
@@ -61,9 +63,10 @@ public class FormCustomer extends javax.swing.JFrame {
             e.printStackTrace();
         }
         this.myEmail = myEmail;
-        controller = new AccountControl(this);
+        accController = new AccountControl(this);
+        transController = new TransactionControl();
         initComponents();
-        myAccount = controller.getAccountByEmail(myEmail, "Customer");
+        myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
@@ -88,7 +91,7 @@ public class FormCustomer extends javax.swing.JFrame {
         fieldYear3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         
         
-        JComponent[] arr = {txtFullName3, txtPassword3, txtConfirmPass3, txtTransTo, txtTransAmount, txtTransDetails, 
+        JComponent[] arr = {txtFullName3, txtPassword3, txtConfirmPass3, txtTransTo, txtTransAmount, txtTransDescription, 
                            btSATrans1, btSATrans2, btSATrans3};
         for(JComponent x : arr){
            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
@@ -157,7 +160,9 @@ public class FormCustomer extends javax.swing.JFrame {
         if(myAccount.getGender().equals("Female")){
             btFemale3.setSelected(true);
         }
-        
+        txtPassword3.setText("");
+        txtConfirmPass3.setText(""); 
+        lblWarnSavePass3.setText(""); 
     }
     private void setTextForNumber(JFormattedTextField txtFormat){
         NumberFormat numFormat = NumberFormat.getNumberInstance();
@@ -332,7 +337,7 @@ public class FormCustomer extends javax.swing.JFrame {
         btSATrans2 = new javax.swing.JButton();
         btSATrans3 = new javax.swing.JButton();
         jLabel16 = new javax.swing.JLabel();
-        txtTransDetails = new javax.swing.JTextField();
+        txtTransDescription = new javax.swing.JTextField();
         txtTransTo = new javax.swing.JFormattedTextField();
         btTransfer3 = new javax.swing.JButton();
 
@@ -885,9 +890,9 @@ public class FormCustomer extends javax.swing.JFrame {
 
         jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(178, 137, 145));
-        jLabel16.setText("Transaction Details");
+        jLabel16.setText("Transaction Description");
 
-        txtTransDetails.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        txtTransDescription.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
         txtTransTo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtTransTo.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -924,7 +929,7 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btSATrans3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(txtTransAmount)
-                    .addComponent(txtTransDetails)
+                    .addComponent(txtTransDescription)
                     .addComponent(txtTransTo)
                     .addComponent(btTransfer3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(217, Short.MAX_VALUE))
@@ -943,14 +948,14 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtTransAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlCardTransferLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btSATrans1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlCardTransferLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btSATrans2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btSATrans3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btSATrans3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSATrans1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel16)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtTransDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtTransDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addComponent(btTransfer3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(119, Short.MAX_VALUE))
@@ -1018,7 +1023,8 @@ public class FormCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
         txtTransTo.setValue(null);
         txtTransAmount.setValue(null);
-        txtTransDetails.setText(myAccount.getFullName() + " chuyen tien");
+        txtTransDescription.setText(myAccount.getFullName() + " chuyen tien");
+        lblToName.setText(""); 
         cardLayout3.show(pnlCard, "Transfer");
     }//GEN-LAST:event_btTransActionPerformed
 
@@ -1123,7 +1129,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btReset3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btReset3ActionPerformed
         // TODO add your handling code here:
-        myAccount = controller.getAccountByEmail(myEmail, "Customer");
+        myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
     }//GEN-LAST:event_btReset3ActionPerformed
 
@@ -1145,7 +1151,7 @@ public class FormCustomer extends javax.swing.JFrame {
             if(btMale3.isSelected()) myAccount.setGender("Male");
             else myAccount.setGender("Female");
             
-            controller.updateObjectInfor(myAccount);
+            accController.updateObjectInfor(myAccount);
             resetAccountInfo();
         }
         
@@ -1176,7 +1182,7 @@ public class FormCustomer extends javax.swing.JFrame {
         if(choice == 0){
             if(new OTPDialog(this, myEmail, "xác nhận đổi mật khẩu").isMatch()){
                 myAccount.setPassword(newPass); 
-                controller.updateObjectPass(myAccount);
+                accController.updateObjectPass(myAccount);
                 JOptionPane.showMessageDialog(this, "Password changed successfully", "", 
                         JOptionPane.INFORMATION_MESSAGE);
             }
@@ -1219,9 +1225,9 @@ public class FormCustomer extends javax.swing.JFrame {
                     "", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        Account toAccount = controller.getAccountByID(txtTransTo.getText(), "Customer");
-        if(toAccount == null){
-            JOptionPane.showMessageDialog(this, "Account is not found!", "", JOptionPane.WARNING_MESSAGE);
+        Account toAccount = accController.getAccountByID(txtTransTo.getText(), "Customer");
+        if(toAccount == null || toAccount.getId().equals(myAccount.getId())){ 
+            JOptionPane.showMessageDialog(this, "Account is not valid!", "", JOptionPane.WARNING_MESSAGE);
             return;
         }
         if(txtTransAmount.getValue() == null || Long.valueOf(txtTransAmount.getValue().toString()) < 1000){
@@ -1235,22 +1241,34 @@ public class FormCustomer extends javax.swing.JFrame {
                     "", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if(txtTransDescription.getText().trim().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter the transfer description!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+        }
         String passInput = JOptionPane.showInputDialog(this,
                                     "Please enter your password to confirm the transfer",
                                                     "", JOptionPane.QUESTION_MESSAGE);
-        if(!passInput.equals(myAccount.getPassword())){
+        if(passInput == null || !passInput.equals(myAccount.getPassword())){
             JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
                     "", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        else{
-            JOptionPane.showMessageDialog(this, "Transfer successfully!", 
-                    "", JOptionPane.INFORMATION_MESSAGE);
+        int result = transController.Transfer(myAccount.getId(), toAccount.getId(), 
+                amount, "TRANSFER", txtTransDescription.getText());
+        if(result == 1){
+            
+            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
         }
+        else if(result == -1){
+            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btTransfer3ActionPerformed
 
     private void txtTransToFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTransToFocusLost
         // TODO add your handling code here:
-        Account toAccount = controller.getAccountByID(txtTransTo.getText(), "Customer");
+        Account toAccount = accController.getAccountByID(txtTransTo.getText(), "Customer");
         if(toAccount != null){
             lblToName.setText("  " + toAccount.getFullName());
         }       
@@ -1346,7 +1364,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JTextField txtFullName3;
     private javax.swing.JPasswordField txtPassword3;
     private javax.swing.JFormattedTextField txtTransAmount;
-    private javax.swing.JTextField txtTransDetails;
+    private javax.swing.JTextField txtTransDescription;
     private javax.swing.JFormattedTextField txtTransTo;
     // End of variables declaration//GEN-END:variables
 }

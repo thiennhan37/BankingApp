@@ -34,12 +34,12 @@ public class AccountControl {
     public int addAccount(Account ac){
         return accountDAO.addObject(ac);
     }
-    public Account getAccountByEmail(String email, String type){
-        return accountDAO.getObjectByEmail(email, type);
+    public Account getAccountByEmail(String email){
+        return accountDAO.getObjectByEmail(email) ; 
     }
     public Account getAccountByID(String id, String type){
         return accountDAO.getObjectByID(id, type);
-    }
+    } 
     public void updateObjectInfor(Account ac){
         accountDAO.updateObjectInfor(ac);
     }

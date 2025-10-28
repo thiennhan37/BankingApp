@@ -133,7 +133,7 @@ public class AccountDAO implements DAOInterface<Account>{
 
 
     @Override
-    public Account getObjectByEmail(String email, String type) {
+    public Account getObjectByEmail(String email) {
         Connection connect = MyDatabase.getConnection();
         Account ac  = null; 
         String id, fullName, password, gender;
@@ -154,6 +154,7 @@ public class AccountDAO implements DAOInterface<Account>{
             password = rs.getString("password"); gender = rs.getString("gender");
             birthDay = rs.getDate("birthDay").toLocalDate();
             active = rs.getBoolean("active");
+            String type = rs.getString("type"); 
             if(type.equals("Customer")){
                 Long balance = rs.getLong("balance");
                 ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
@@ -241,6 +242,28 @@ public class AccountDAO implements DAOInterface<Account>{
         MyDatabase.closeConnection(connect);
         return ac;
     }
-
+    
+    public boolean updateBalance(Connection connect, String id, Long amount){
+        try{
+            connect.setAutoCommit(false);
+            
+            String command = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+            PreparedStatement statement = connect.prepareStatement(command);
+            statement.setLong(1, amount);
+            statement.setString(2, id); 
+            int result = statement.executeUpdate();
+            return (result > 0);
+        }
+        catch(SQLException e){
+            try {connect.rollback();} catch(SQLException er){}
+            e.printStackTrace();
+        }
+        finally{
+            if(connect != null){
+                try{connect.setAutoCommit(true);} catch(SQLException ex){}
+            }
+        }
+        return false;
+    }
     
 }

@@ -1193,7 +1193,7 @@
                               <Component id="btSATrans3" min="-2" pref="118" max="-2" attributes="0"/>
                           </Group>
                           <Component id="txtTransAmount" max="32767" attributes="0"/>
-                          <Component id="txtTransDetails" max="32767" attributes="0"/>
+                          <Component id="txtTransDescription" max="32767" attributes="0"/>
                           <Component id="txtTransTo" alignment="0" max="32767" attributes="0"/>
                           <Component id="btTransfer3" max="32767" attributes="0"/>
                       </Group>
@@ -1215,15 +1215,15 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtTransAmount" min="-2" pref="35" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="btSATrans1" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btSATrans2" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
                           <Component id="btSATrans3" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
+                          <Component id="btSATrans1" min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtTransDetails" min="-2" pref="35" max="-2" attributes="0"/>
+                      <Component id="txtTransDescription" min="-2" pref="35" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                       <Component id="btTransfer3" min="-2" pref="35" max="-2" attributes="0"/>
                       <EmptySpace pref="119" max="32767" attributes="0"/>
@@ -1288,10 +1288,10 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="91" green="89" red="b2" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Transaction Details"/>
+                <Property name="text" type="java.lang.String" value="Transaction Description"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="txtTransDetails">
+            <Component class="javax.swing.JTextField" name="txtTransDescription">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="12" style="1"/>

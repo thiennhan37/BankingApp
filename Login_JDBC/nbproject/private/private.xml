@@ -6,9 +6,11 @@
             <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/View/FormCustomer.java</file>
             <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/View/FormLogin.java</file>
             <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/DAO/DAOInterface.java</file>
-            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/Control/AccountControl.java</file>
             <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/DAO/AccountDAO.java</file>
-            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/View/OTPDialog.java</file>
+            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/Model/Customer.java</file>
+            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/Model/Transaction.java</file>
+            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/Control/TransactionControl.java</file>
+            <file>file:/D:/test_git/github/BankingApp/Login_JDBC/src/DAO/TransactionDAO.java</file>
         </group>
     </open-files>
 </project-private>
