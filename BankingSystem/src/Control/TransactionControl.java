@@ -42,9 +42,13 @@ public class TransactionControl {
                 // trans.setStatus("SUCCESSFUL"); 
                 return 1;
             }
+            else{
+                
+                return -1;
+            }
+                    
         }
         catch(SQLException e){
-            
             transDAO.updateStatus(trans.getTransID(), "FAILED");
         }
         finally{
@@ -52,4 +56,5 @@ public class TransactionControl {
         }
         return 0;
     }
+
 }

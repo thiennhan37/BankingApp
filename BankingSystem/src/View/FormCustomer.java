@@ -7,7 +7,6 @@ package View;
 import Control.AccountControl;
 import Control.TransactionControl;
 import Model.Account;
-import Process.SendMail;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -24,12 +23,9 @@ import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.Document;
-import javax.swing.text.DocumentFilter;
 import javax.swing.text.NumberFormatter;
 
 /**
@@ -53,7 +49,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon closeEyeImage = new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"));
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
-    
+    private DefaultTableModel historyTableModel;
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
@@ -71,10 +67,14 @@ public class FormCustomer extends javax.swing.JFrame {
         resetAccountInfo();
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
+        historyTableModel = (DefaultTableModel) tblHistory.getModel();
         
         settingGUIComponent();
         setMouseList(); 
         setAmountText(txtTransAmount, new JButton[]{btSATrans1, btSATrans2, btSATrans3});
+        setAmountText(txtDrawAmount, new JButton[]{btSADraw1, btSADraw2, btSADraw3});
+        setAmountText(txtDepositAmount, new JButton[]{btSADeposit1, btSADeposit2, btSADeposit3});
+        
         setTextForNumber(txtTransTo); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
@@ -82,9 +82,10 @@ public class FormCustomer extends javax.swing.JFrame {
     } 
     private void settingGUIComponent(){
         // btHistory.putClientProperty(FlatClientProperties.STYLE,"arc:0; ");
-        btSaveInfo3.putClientProperty(FlatClientProperties.STYLE,"arc:25; ");
-        btChangePass3.putClientProperty(FlatClientProperties.STYLE,"arc:25; ");
-        btTransfer3.putClientProperty(FlatClientProperties.STYLE,"arc:25; ");
+        JComponent[] btArr = {btSaveInfo3, btChangePass3, btTransfer3, btWithdraw3, btDeposit3};
+        for(JComponent x : btArr){
+           x.putClientProperty(FlatClientProperties.STYLE,"arc:25;");
+        }
         
         lblEmail3.putClientProperty("FlatLaf.style", "arc:20; background:#F0F8FF;");
         fieldDay3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
@@ -93,10 +94,30 @@ public class FormCustomer extends javax.swing.JFrame {
         
         
         JComponent[] arr = {txtFullName3, txtPassword3, txtConfirmPass3, txtTransTo, txtTransAmount, txtTransDescription, 
-                           btSATrans1, btSATrans2, btSATrans3};
+                           btSATrans1, btSATrans2, btSATrans3, 
+                            txtDrawAmount, txtDrawDescription, btSADraw1, btSADraw2, btSADraw3, 
+                            txtDepositAmount, txtDepositDescription, btSADeposit1, btSADeposit2, btSADeposit3};
         for(JComponent x : arr){
            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
+        
+//        tblHistory.putClientProperty("FlatLaf.style", ""
+//            + "rowHeight: 28;"
+//            + "showHorizontalLines:true;"
+//            + "showVerticalLines:true;"
+//            + "selectionBackground:#E0F7FA;"
+//            + "selectionForeground:#004D40;"
+//            + "gridColor:#B0BEC5;"
+//            + "font: 14 Roboto;"
+//        );
+        JTableHeader header = tblHistory.getTableHeader();
+        header.putClientProperty("FlatLaf.style", ""
+                + "background: #99FFFF;"
+                + "foreground: #37474F;"
+
+        );
+        header.setReorderingAllowed(false); // không cho kéo đổi thứ tự cột
+        header.setResizingAllowed(true); // có thể cho resize nếu muốn
         
     }   
     
@@ -153,7 +174,6 @@ public class FormCustomer extends javax.swing.JFrame {
         if(myAccount.getType().equals("Customer")) lblBalance3.setText(myAccount.getBalace().toString());
         lblFullName3.setText(myAccount.getFullName());
         lblAccNumber3.setText(myAccount.getId());
-        lblBalance3.setText(myAccount.getBalace().toString());
         lblEmail3.setText("   " + myAccount.getEmail());
         txtFullName3.setText(myAccount.getFullName());
         fieldDay3.setSelectedIndex(myAccount.getBirthDay().getDayOfMonth() - 1);
@@ -165,10 +185,16 @@ public class FormCustomer extends javax.swing.JFrame {
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
+        
+        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
+        lblBalance3.setText(nf.format(myAccount.getBalace()));
     }
     private void resetAccount(){
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
+    }
+    private void loadHistoryTable(){
+        
     }
     private void setTextForNumber(JFormattedTextField txtFormat){
         NumberFormat numFormat = NumberFormat.getNumberInstance();
@@ -191,7 +217,7 @@ public class FormCustomer extends javax.swing.JFrame {
         });
     }
     private void setAmountText(JFormattedTextField txtFormat, JButton[] arr){
-        NumberFormat numFormat = NumberFormat.getNumberInstance();
+        NumberFormat numFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
         numFormat.setGroupingUsed(true);
         Long mx = 10_000_000_000L;
         NumberFormatter formatter = new NumberFormatter(numFormat);
@@ -206,7 +232,7 @@ public class FormCustomer extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent e) {
                 if ((e.getKeyCode() == java.awt.event.KeyEvent.VK_DELETE ||
                      e.getKeyCode() == java.awt.event.KeyEvent.VK_BACK_SPACE) &&
-                    txtFormat.getText().replace(",", "").trim().length() <= 1) {
+                    txtFormat.getText().replace(".", "").trim().length() <= 1) {
                     txtFormat.setValue(null);  // cho phép xóa hết
                 }
             }
@@ -219,7 +245,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 isFormatting = true;
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        String text = txtFormat.getText().replace(",", "").trim();
+                        String text = txtFormat.getText().replace(".", "").trim();
 
                         // Nếu rỗng thì xóa gợi ý
                         if (text.isEmpty() || !text.matches("\\d+")) {
@@ -261,7 +287,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 @Override
                 public void mouseClicked(java.awt.event.MouseEvent e) {
                     
-                    String text = x.getText().replace(",", "").trim();
+                    String text = x.getText().replace(".", "").trim();
                     if(text.isEmpty()) return;
                     txtFormat.setValue(Long.valueOf(text));
                 }
@@ -283,6 +309,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private void initComponents() {
 
         GenderGroup3 = new javax.swing.ButtonGroup();
+        jLabel19 = new javax.swing.JLabel();
         pnlTop = new javax.swing.JPanel();
         btReset3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -305,6 +332,7 @@ public class FormCustomer extends javax.swing.JFrame {
         lblLineCol1 = new javax.swing.JLabel();
         lblLineRow2 = new javax.swing.JLabel();
         pnlCard = new javax.swing.JPanel();
+        pnlCardStatics = new javax.swing.JPanel();
         pnlCardHome = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -333,6 +361,27 @@ public class FormCustomer extends javax.swing.JFrame {
         btChangePass3 = new javax.swing.JButton();
         lblWarnSavePass3 = new javax.swing.JLabel();
         pnlCardHistory = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblHistory = new javax.swing.JTable();
+        pnlCardMoney = new javax.swing.JPanel();
+        pnlWithdraw = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        txtDrawAmount = new javax.swing.JFormattedTextField();
+        btSADraw1 = new javax.swing.JButton();
+        btSADraw2 = new javax.swing.JButton();
+        btSADraw3 = new javax.swing.JButton();
+        btWithdraw3 = new javax.swing.JButton();
+        txtDrawDescription = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel22 = new javax.swing.JLabel();
+        txtDepositAmount = new javax.swing.JFormattedTextField();
+        btSADeposit1 = new javax.swing.JButton();
+        btSADeposit2 = new javax.swing.JButton();
+        btSADeposit3 = new javax.swing.JButton();
+        btDeposit3 = new javax.swing.JButton();
+        txtDepositDescription = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
         pnlCardTransfer = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         lblToName = new javax.swing.JLabel();
@@ -347,6 +396,8 @@ public class FormCustomer extends javax.swing.JFrame {
         btTransfer3 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
+
+        jLabel19.setText("jLabel19");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -548,6 +599,19 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.setLayout(new java.awt.CardLayout());
 
+        javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
+        pnlCardStatics.setLayout(pnlCardStaticsLayout);
+        pnlCardStaticsLayout.setHorizontalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 592, Short.MAX_VALUE)
+        );
+        pnlCardStaticsLayout.setVerticalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 492, Short.MAX_VALUE)
+        );
+
+        pnlCard.add(pnlCardStatics, "card7");
+
         pnlCardHome.setAlignmentX(0.0F);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Giám đốc nhân sự 093 456 789 xinchao@trangwebhay.vn.gif"))); // NOI18N
@@ -571,9 +635,9 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlCardHomeLayout.setVerticalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(0, 0, 0)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 178, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 184, Short.MAX_VALUE)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -851,18 +915,218 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardProfile, "Profile");
 
+        tblHistory.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Amount", "Type", "Status", "Time", "Description"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        tblHistory.setGridColor(new java.awt.Color(102, 102, 102));
+        tblHistory.setRowHeight(30);
+        tblHistory.setSelectionBackground(new java.awt.Color(153, 255, 153));
+        tblHistory.setShowGrid(true);
+        jScrollPane1.setViewportView(tblHistory);
+
         javax.swing.GroupLayout pnlCardHistoryLayout = new javax.swing.GroupLayout(pnlCardHistory);
         pnlCardHistory.setLayout(pnlCardHistoryLayout);
         pnlCardHistoryLayout.setHorizontalGroup(
             pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 592, Short.MAX_VALUE)
+            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                .addContainerGap())
         );
         pnlCardHistoryLayout.setVerticalGroup(
             pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 492, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardHistoryLayout.createSequentialGroup()
+                .addContainerGap(101, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
         );
 
         pnlCard.add(pnlCardHistory, "History");
+
+        pnlWithdraw.setBackground(new java.awt.Color(255, 255, 255));
+        pnlWithdraw.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Withdraw", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel21.setText("Amount");
+
+        txtDrawAmount.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        btWithdraw3.setBackground(new java.awt.Color(153, 255, 255));
+        btWithdraw3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btWithdraw3.setForeground(new java.awt.Color(178, 137, 145));
+        btWithdraw3.setText("Withdraw");
+        btWithdraw3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btWithdraw3ActionPerformed(evt);
+            }
+        });
+
+        txtDrawDescription.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel18.setText("Transaction Description");
+
+        javax.swing.GroupLayout pnlWithdrawLayout = new javax.swing.GroupLayout(pnlWithdraw);
+        pnlWithdraw.setLayout(pnlWithdrawLayout);
+        pnlWithdrawLayout.setHorizontalGroup(
+            pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlWithdrawLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlWithdrawLayout.createSequentialGroup()
+                        .addGroup(pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel21)
+                            .addGroup(pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(txtDrawAmount, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtDrawDescription, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(pnlWithdrawLayout.createSequentialGroup()
+                                    .addComponent(btSADraw1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btSADraw2, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btSADraw3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(159, Short.MAX_VALUE))
+                    .addGroup(pnlWithdrawLayout.createSequentialGroup()
+                        .addGroup(pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btWithdraw3, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel18))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        pnlWithdrawLayout.setVerticalGroup(
+            pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlWithdrawLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDrawAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlWithdrawLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btSADraw2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSADraw1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSADraw3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDrawDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btWithdraw3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Deposit", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel22.setText("Amount");
+
+        txtDepositAmount.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtDepositAmount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDepositAmountActionPerformed(evt);
+            }
+        });
+
+        btDeposit3.setBackground(new java.awt.Color(153, 255, 255));
+        btDeposit3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btDeposit3.setForeground(new java.awt.Color(178, 137, 145));
+        btDeposit3.setText("Deposit");
+        btDeposit3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btDeposit3ActionPerformed(evt);
+            }
+        });
+
+        txtDepositDescription.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+
+        jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel20.setText("Transaction Description");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel22)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(txtDepositAmount, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtDepositDescription, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(btSADeposit1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btSADeposit2, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btSADeposit3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(159, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btDeposit3, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel20))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDepositAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btSADeposit2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSADeposit1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSADeposit3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel20)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDepositDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btDeposit3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnlCardMoneyLayout = new javax.swing.GroupLayout(pnlCardMoney);
+        pnlCardMoney.setLayout(pnlCardMoneyLayout);
+        pnlCardMoneyLayout.setHorizontalGroup(
+            pnlCardMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardMoneyLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(pnlCardMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlWithdraw, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(38, Short.MAX_VALUE))
+        );
+        pnlCardMoneyLayout.setVerticalGroup(
+            pnlCardMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardMoneyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlWithdraw, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        pnlCard.add(pnlCardMoney, "cardMoney");
 
         pnlCardTransfer.setBackground(new java.awt.Color(255, 255, 255));
         pnlCardTransfer.setName(""); // NOI18N
@@ -1045,6 +1309,9 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMoneyActionPerformed
         // TODO add your handling code here:
+        txtDrawAmount.setValue(null); txtDrawDescription.setText(myAccount.getFullName() + " rut tien");
+        txtDepositAmount.setValue(null); txtDepositDescription.setText(myAccount.getFullName() + " gui tien"); 
+        cardLayout3.show(pnlCard, "cardMoney");
     }//GEN-LAST:event_btMoneyActionPerformed
 
     private void btHistoryFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_btHistoryFocusLost
@@ -1242,6 +1509,7 @@ public class FormCustomer extends javax.swing.JFrame {
         if(txtTransDescription.getText().trim().isEmpty()){
             JOptionPane.showMessageDialog(this, "Please enter the transfer description!", 
                     "", JOptionPane.WARNING_MESSAGE);
+            return;
         }
         String passInput = JOptionPane.showInputDialog(this,
                                     "Please enter your password to confirm the transfer",
@@ -1278,6 +1546,89 @@ public class FormCustomer extends javax.swing.JFrame {
         cardLayout3.show(pnlCard, "Profile");
     }//GEN-LAST:event_btProfileActionPerformed
 
+    private void btWithdraw3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWithdraw3ActionPerformed
+        // TODO add your handling code here:
+        if(txtDrawAmount.getValue() == null || Long.valueOf(txtDrawAmount.getValue().toString()) < 1000){
+            JOptionPane.showMessageDialog(this, "Amount is not valid!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Long amount = Long.valueOf(txtDrawAmount.getValue().toString());
+        if(amount > myAccount.getBalace()){
+            JOptionPane.showMessageDialog(this, "Your account balance is too low for this transaction!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(txtDrawDescription.getText().trim().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter the transfer description!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String passInput = JOptionPane.showInputDialog(this,
+                                    "Please enter your password to confirm the transfer",
+                                                    "", JOptionPane.QUESTION_MESSAGE);
+        if(passInput == null || !passInput.equals(myAccount.getPassword())){
+            JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int result = transController.Transfer(myAccount.getId(), null, 
+                amount, "WITHDRAW", txtDrawDescription.getText());
+        if(result == 1){
+            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            resetAccount();
+        }
+        else if(result == -1){
+            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
+    }//GEN-LAST:event_btWithdraw3ActionPerformed
+
+    private void txtDepositAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepositAmountActionPerformed
+        // TODO add your handling code here:
+        if(txtDepositAmount.getValue() == null || Long.valueOf(txtDepositAmount.getValue().toString()) < 1000){
+            JOptionPane.showMessageDialog(this, "Amount is not valid!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Long amount = Long.valueOf(txtDepositAmount.getValue().toString());
+        if(amount > myAccount.getBalace()){
+            JOptionPane.showMessageDialog(this, "Your account balance is too low for this transaction!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(txtDepositDescription.getText().trim().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Please enter the transfer description!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String passInput = JOptionPane.showInputDialog(this,
+                                    "Please enter your password to confirm the transfer",
+                                                    "", JOptionPane.QUESTION_MESSAGE);
+        if(passInput == null || !passInput.equals(myAccount.getPassword())){
+            JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
+                    "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int result = transController.Transfer(null, myAccount.getId(), 
+                amount, "DEPOSIT", txtDepositDescription.getText());
+        if(result == 1){
+            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            resetAccount();
+        }
+        else if(result == -1){
+            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else
+            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
+    }//GEN-LAST:event_txtDepositAmountActionPerformed
+
+    private void btDeposit3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeposit3ActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_btDeposit3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1308,6 +1659,7 @@ public class FormCustomer extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GenderGroup3;
     private javax.swing.JButton btChangePass3;
+    private javax.swing.JButton btDeposit3;
     private javax.swing.JButton btEyePass3;
     private javax.swing.JRadioButton btFemale3;
     private javax.swing.JButton btHistory;
@@ -1317,6 +1669,12 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JButton btMoney;
     private javax.swing.JButton btProfile;
     private javax.swing.JButton btReset3;
+    private javax.swing.JButton btSADeposit1;
+    private javax.swing.JButton btSADeposit2;
+    private javax.swing.JButton btSADeposit3;
+    private javax.swing.JButton btSADraw1;
+    private javax.swing.JButton btSADraw2;
+    private javax.swing.JButton btSADraw3;
     private javax.swing.JButton btSATrans1;
     private javax.swing.JButton btSATrans2;
     private javax.swing.JButton btSATrans3;
@@ -1324,6 +1682,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JButton btStatics;
     private javax.swing.JButton btTransfer;
     private javax.swing.JButton btTransfer3;
+    private javax.swing.JButton btWithdraw3;
     private javax.swing.JComboBox<String> fieldDay3;
     private javax.swing.JComboBox<String> fieldMonth3;
     private javax.swing.JComboBox<String> fieldYear3;
@@ -1336,7 +1695,12 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1344,6 +1708,8 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblAccNumber3;
     private javax.swing.JLabel lblBalance3;
     private javax.swing.JLabel lblEmail3;
@@ -1358,14 +1724,22 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JPanel pnlCard;
     private javax.swing.JPanel pnlCardHistory;
     private javax.swing.JPanel pnlCardHome;
+    private javax.swing.JPanel pnlCardMoney;
     private javax.swing.JPanel pnlCardProfile;
+    private javax.swing.JPanel pnlCardStatics;
     private javax.swing.JPanel pnlCardTransfer;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
     private javax.swing.JPanel pnlSubProfile1;
     private javax.swing.JPanel pnlSubProfile2;
     private javax.swing.JPanel pnlTop;
+    private javax.swing.JPanel pnlWithdraw;
+    private javax.swing.JTable tblHistory;
     private javax.swing.JPasswordField txtConfirmPass3;
+    private javax.swing.JFormattedTextField txtDepositAmount;
+    private javax.swing.JTextField txtDepositDescription;
+    private javax.swing.JFormattedTextField txtDrawAmount;
+    private javax.swing.JTextField txtDrawDescription;
     private javax.swing.JTextField txtFullName3;
     private javax.swing.JPasswordField txtPassword3;
     private javax.swing.JFormattedTextField txtTransAmount;

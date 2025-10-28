@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -106,6 +107,5 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result > 0;
     }
-
 
 }
