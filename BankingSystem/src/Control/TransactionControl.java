@@ -37,13 +37,15 @@ public class TransactionControl {
                 }
                 LocalDateTime receiveTime = LocalDateTime.now();
                 transDAO.updateReceiveTime(trans.getTransID(), receiveTime);
-                trans.setReceiveTime(receiveTime); 
-                trans.setStatus("SUCCESSFUL"); 
+                transDAO.updateStatus(trans.getTransID(), "SUCCESSFUL");
+                // trans.setReceiveTime(receiveTime); 
+                // trans.setStatus("SUCCESSFUL"); 
                 return 1;
             }
         }
         catch(SQLException e){
-            trans.setStatus("FAILED"); 
+            
+            transDAO.updateStatus(trans.getTransID(), "FAILED");
         }
         finally{
             if(connect != null) try{connect.setAutoCommit(true);} catch(SQLException ex){}

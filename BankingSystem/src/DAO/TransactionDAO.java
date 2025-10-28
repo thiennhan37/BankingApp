@@ -86,4 +86,26 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result > 0;
     }
+
+    public boolean updateStatus(String transID, String status){
+        Connection c = MyDatabase.getConnection();
+        int result = 0;
+        try{
+            String command = "UPDATE transactions "
+                    + "SET status = ? WHERE transID = ?";
+            PreparedStatement statement = c.prepareStatement(command);
+            statement.setString(1, status); 
+            statement.setString(2, transID); 
+            
+            result = statement.executeUpdate();
+            // System.out.println(result);
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        MyDatabase.closeConnection(c);
+        return result > 0;
+    }
+
+
 }

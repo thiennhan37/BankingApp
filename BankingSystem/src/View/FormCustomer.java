@@ -149,6 +149,7 @@ public class FormCustomer extends javax.swing.JFrame {
         txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         txtPassword3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         txtConfirmPass3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        if(myAccount.getType().equals("Customer")) lblBalance3.setText(myAccount.getBalace().toString());
         lblFullName3.setText(myAccount.getFullName());
         lblAccNumber3.setText(myAccount.getId());
         lblBalance3.setText(myAccount.getBalace().toString());
@@ -163,6 +164,10 @@ public class FormCustomer extends javax.swing.JFrame {
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
+    }
+    private void resetAccount(){
+        myAccount = accController.getAccountByEmail(myEmail);
+        resetAccountInfo();
     }
     private void setTextForNumber(JFormattedTextField txtFormat){
         NumberFormat numFormat = NumberFormat.getNumberInstance();
@@ -1129,8 +1134,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btReset3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btReset3ActionPerformed
         // TODO add your handling code here:
-        myAccount = accController.getAccountByEmail(myEmail);
-        resetAccountInfo();
+        resetAccount();
     }//GEN-LAST:event_btReset3ActionPerformed
 
     private void txtFullName3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullName3ActionPerformed
@@ -1256,8 +1260,8 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(myAccount.getId(), toAccount.getId(), 
                 amount, "TRANSFER", txtTransDescription.getText());
         if(result == 1){
-            
             JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            resetAccount();
         }
         else if(result == -1){
             JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
