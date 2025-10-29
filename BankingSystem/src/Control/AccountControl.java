@@ -8,6 +8,7 @@ import DAO.AccountDAO;
 import View.FormLogin;
 import Model.Account;
 import View.FormCustomer;
+import View.FormStaff;
 /**
  *
  * @author Hi
@@ -16,6 +17,7 @@ public class AccountControl {
     private FormLogin formLogin;
     private AccountDAO accountDAO;
     private FormCustomer formCustomer;
+    private FormStaff formStaff;
     
     public AccountControl(FormLogin formLogin) {
         this.formLogin = formLogin;
@@ -23,6 +25,10 @@ public class AccountControl {
     }
     public AccountControl(FormCustomer formCustomer) {
         this.formCustomer = formCustomer;
+        this.accountDAO = AccountDAO.getInstance();
+    }
+    public AccountControl(FormStaff formStaff) {
+        this.formStaff = formStaff;
         this.accountDAO = AccountDAO.getInstance();
     }
     public boolean checkExistedAccount(String email){

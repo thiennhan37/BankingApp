@@ -201,4 +201,57 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result;
     }
+
+    public List<Transaction> filterTransForAuthorize(String senderID, String receiverID, 
+            LocalDateTime beginTime, LocalDateTime endTime, String type){
+        List<Transaction> result = new ArrayList<>();
+        if(type.equals("WITHDRAW")) return result;
+        Connection c = MyDatabase.getConnection();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        
+        try{
+            String command = "SELECT * FROM transactions "
+                    + "WHERE (sendTime >= ? AND sendTime < ?) AND status = 'PENDING' ";
+            String add1 = ""; if(senderID != null) add1 = " AND senderID = ? ";
+            String add2 = ""; if(receiverID != null) add2 = " AND receiverID = ? ";
+            String add3 = ""; 
+            if(type.equals("TRANSFER")) add3 = " AND type = 'TRANSFER'";
+            else if(type.equals("DEPOSIT")) add3 = " AND type = 'DEPOSIT'";
+            command = command + add1 + add2 + add3;
+            statement = c.prepareStatement(command);
+            int cnt = 3;
+            statement.setTimestamp(1, Timestamp.valueOf(beginTime)); 
+            statement.setTimestamp(2, Timestamp.valueOf(endTime)); 
+            if(senderID != null){
+                statement.setString(cnt++, senderID);
+            }
+            if(receiverID != null){
+                statement.setString(cnt++, receiverID);
+            }
+            
+            rs = statement.executeQuery();
+            while(rs.next()){
+                Transaction x = new Transaction();
+                x.setTransID(rs.getString("transID")); 
+                x.setSenderID(rs.getString("senderID"));
+                x.setReceiverID(rs.getString("receiverID"));
+                x.setAmount((Long)rs.getLong("amount"));
+                x.setType(rs.getString("type"));
+                x.setStatus(rs.getString("status")); 
+                x.setSendTime(rs.getTimestamp("sendTime").toLocalDateTime());
+                result.add(x);
+            }
+            // System.out.println(result);
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{ if(statement != null) statement.close();} catch(SQLException ex){}
+            try{ if(rs != null) rs.close();} catch(SQLException ex){}
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
 }

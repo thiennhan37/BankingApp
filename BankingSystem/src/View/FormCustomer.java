@@ -200,6 +200,7 @@ public class FormCustomer extends javax.swing.JFrame {
         if(myAccount.getGender().equals("Female")){
             btFemale3.setSelected(true);
         }
+        else btMale3.setSelected(true);
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
@@ -740,6 +741,7 @@ public class FormCustomer extends javax.swing.JFrame {
         GenderGroup3.add(btMale3);
         btMale3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btMale3.setForeground(new java.awt.Color(178, 137, 145));
+        btMale3.setSelected(true);
         btMale3.setText("Male");
 
         GenderGroup3.add(btFemale3);
@@ -1684,7 +1686,8 @@ public class FormCustomer extends javax.swing.JFrame {
         Account toAccount = accController.getAccountByID(txtTransTo.getText(), "Customer");
         if(toAccount != null){
             lblToName.setText("  " + toAccount.getFullName());
-        }       
+        }
+        else lblToName.setText("");
     }//GEN-LAST:event_txtTransToFocusLost
 
     private void btProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btProfileActionPerformed
@@ -1836,7 +1839,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "11@gmail.com";
+        String email = "nhanprovip37@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }

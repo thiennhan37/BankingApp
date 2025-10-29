@@ -25,17 +25,26 @@ public class Staff extends Account{
         this.branch = branch;
         this.id = id;
     }
-    @Override
-    public String getType() {
-        return "Staff";
+
+    public static int getNumber() {
+        return number;
     }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    @Override
+    public String getType() {return "Customer";}
+    
     @Override
     public Long getBalace() {
         return null;
     }
-    @Override
-    public String getBranch() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
     
 }
