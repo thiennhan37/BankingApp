@@ -7,6 +7,7 @@ package View;
 import Control.AccountControl;
 import Control.TransactionControl;
 import Model.Account;
+import Model.Transaction;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -15,6 +16,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -25,6 +27,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
@@ -50,6 +53,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private DefaultTableModel historyTableModel;
+    private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));;
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
@@ -63,6 +67,7 @@ public class FormCustomer extends javax.swing.JFrame {
         accController = new AccountControl(this);
         transController = new TransactionControl();
         initComponents();
+        
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
         txtPassword3.setEchoChar((char) 0); 
@@ -81,20 +86,22 @@ public class FormCustomer extends javax.swing.JFrame {
          
     } 
     private void settingGUIComponent(){
-        // btHistory.putClientProperty(FlatClientProperties.STYLE,"arc:0; ");
         JComponent[] btArr = {btSaveInfo3, btChangePass3, btTransfer3, btWithdraw3, btDeposit3};
         for(JComponent x : btArr){
            x.putClientProperty(FlatClientProperties.STYLE,"arc:25;");
         }
         
         lblEmail3.putClientProperty("FlatLaf.style", "arc:20; background:#F0F8FF;");
-        fieldDay3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
-        fieldMonth3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
-        fieldYear3.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        
+        JComponent[] fieldTime = {fieldDay3, fieldMonth3, fieldYear3, fieldBeginMonth, fieldBeginYear,
+                    fieldEndMonth, fieldEndYear, fieldType, fieldStatus};
+        for(JComponent x : fieldTime){
+           x.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
         
         
-        JComponent[] arr = {txtFullName3, txtPassword3, txtConfirmPass3, txtTransTo, txtTransAmount, txtTransDescription, 
-                           btSATrans1, btSATrans2, btSATrans3, 
+        JComponent[] arr = {txtFullName3, txtPassword3, txtConfirmPass3, 
+                            txtTransTo, txtTransAmount, txtTransDescription, btSATrans1, btSATrans2, btSATrans3, 
                             txtDrawAmount, txtDrawDescription, btSADraw1, btSADraw2, btSADraw3, 
                             txtDepositAmount, txtDepositDescription, btSADeposit1, btSADeposit2, btSADeposit3};
         for(JComponent x : arr){
@@ -116,6 +123,17 @@ public class FormCustomer extends javax.swing.JFrame {
                 + "foreground: #37474F;"
 
         );
+        TableColumnModel columnModel = tblHistory.getColumnModel();
+        columnModel.getColumn(5).setPreferredWidth(140);
+        columnModel.getColumn(4).setPreferredWidth(60);
+        columnModel.getColumn(3).setPreferredWidth(50);
+        columnModel.getColumn(2).setPreferredWidth(40);
+        columnModel.getColumn(1).setPreferredWidth(50);
+        columnModel.getColumn(0).setPreferredWidth(40);
+//        columnModel.getColumn(1).setPreferredWidth(45); 
+//        columnModel.getColumn(2).setPreferredWidth(30);
+
+
         header.setReorderingAllowed(false); // không cho kéo đổi thứ tự cột
         header.setResizingAllowed(true); // có thể cho resize nếu muốn
         
@@ -186,8 +204,8 @@ public class FormCustomer extends javax.swing.JFrame {
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
         
-        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
-        lblBalance3.setText(nf.format(myAccount.getBalace()));
+        
+        lblBalance3.setText(numberFormat.format(myAccount.getBalace()));
     }
     private void resetAccount(){
         myAccount = accController.getAccountByEmail(myEmail);
@@ -310,6 +328,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         GenderGroup3 = new javax.swing.ButtonGroup();
         jLabel19 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
         pnlTop = new javax.swing.JPanel();
         btReset3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -360,9 +379,6 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         btChangePass3 = new javax.swing.JButton();
         lblWarnSavePass3 = new javax.swing.JLabel();
-        pnlCardHistory = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblHistory = new javax.swing.JTable();
         pnlCardMoney = new javax.swing.JPanel();
         pnlWithdraw = new javax.swing.JPanel();
         jLabel21 = new javax.swing.JLabel();
@@ -394,6 +410,20 @@ public class FormCustomer extends javax.swing.JFrame {
         txtTransDescription = new javax.swing.JTextField();
         txtTransTo = new javax.swing.JFormattedTextField();
         btTransfer3 = new javax.swing.JButton();
+        pnlCardHistory = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblHistory = new javax.swing.JTable();
+        fieldEndYear = new javax.swing.JComboBox<>();
+        fieldEndMonth = new javax.swing.JComboBox<>();
+        jLabel23 = new javax.swing.JLabel();
+        fieldBeginYear = new javax.swing.JComboBox<>();
+        fieldBeginMonth = new javax.swing.JComboBox<>();
+        jLabel24 = new javax.swing.JLabel();
+        fieldType = new javax.swing.JComboBox<>();
+        jLabel25 = new javax.swing.JLabel();
+        btFindHistory = new javax.swing.JButton();
+        fieldStatus = new javax.swing.JComboBox<>();
+        jLabel26 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
 
@@ -710,7 +740,6 @@ public class FormCustomer extends javax.swing.JFrame {
         GenderGroup3.add(btMale3);
         btMale3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btMale3.setForeground(new java.awt.Color(178, 137, 145));
-        btMale3.setSelected(true);
         btMale3.setText("Male");
 
         GenderGroup3.add(btFemale3);
@@ -914,47 +943,6 @@ public class FormCustomer extends javax.swing.JFrame {
         );
 
         pnlCard.add(pnlCardProfile, "Profile");
-
-        tblHistory.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "Amount", "Type", "Status", "Time", "Description"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        tblHistory.setGridColor(new java.awt.Color(102, 102, 102));
-        tblHistory.setRowHeight(30);
-        tblHistory.setSelectionBackground(new java.awt.Color(153, 255, 153));
-        tblHistory.setShowGrid(true);
-        jScrollPane1.setViewportView(tblHistory);
-
-        javax.swing.GroupLayout pnlCardHistoryLayout = new javax.swing.GroupLayout(pnlCardHistory);
-        pnlCardHistory.setLayout(pnlCardHistoryLayout);
-        pnlCardHistoryLayout.setHorizontalGroup(
-            pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlCardHistoryLayout.setVerticalGroup(
-            pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardHistoryLayout.createSequentialGroup()
-                .addContainerGap(101, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
-        );
-
-        pnlCard.add(pnlCardHistory, "History");
 
         pnlWithdraw.setBackground(new java.awt.Color(255, 255, 255));
         pnlWithdraw.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Withdraw", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
@@ -1224,6 +1212,161 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardTransfer, "Transfer");
 
+        tblHistory.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Amount", "Type", "Status", "Time", "Description"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblHistory.setGridColor(new java.awt.Color(102, 102, 102));
+        tblHistory.setRowHeight(30);
+        tblHistory.setSelectionBackground(new java.awt.Color(153, 255, 153));
+        tblHistory.setSelectionForeground(new java.awt.Color(0, 0, 153));
+        tblHistory.setShowGrid(true);
+        jScrollPane1.setViewportView(tblHistory);
+
+        fieldEndYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910", "1911", "1912", "1913", "1914", "1915", "1916", "1917", "1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970", "1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        fieldEndYear.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldEndYearFocusLost(evt);
+            }
+        });
+
+        fieldEndMonth.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        fieldEndMonth.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldEndMonthFocusLost(evt);
+            }
+        });
+
+        jLabel23.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel23.setText("End");
+
+        fieldBeginYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910", "1911", "1912", "1913", "1914", "1915", "1916", "1917", "1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970", "1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        fieldBeginYear.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldBeginYearFocusLost(evt);
+            }
+        });
+
+        fieldBeginMonth.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        fieldBeginMonth.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldBeginMonthFocusLost(evt);
+            }
+        });
+
+        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel24.setText("Begin");
+
+        fieldType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ALL", "TRANSFER", "WITHDRAW", "DEPOSIT" }));
+
+        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel25.setText("Type");
+
+        btFindHistory.setBackground(new java.awt.Color(153, 255, 255));
+        btFindHistory.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btFindHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Find.png"))); // NOI18N
+        btFindHistory.setText(" Find");
+        btFindHistory.setFocusable(false);
+        btFindHistory.setOpaque(true);
+        btFindHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btFindHistoryActionPerformed(evt);
+            }
+        });
+
+        fieldStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ALL", "SUCCESSFUL", "PENDING", "FAILED" }));
+
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel26.setText("Status");
+
+        javax.swing.GroupLayout pnlCardHistoryLayout = new javax.swing.GroupLayout(pnlCardHistory);
+        pnlCardHistory.setLayout(pnlCardHistoryLayout);
+        pnlCardHistoryLayout.setHorizontalGroup(
+            pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                    .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                                .addComponent(fieldBeginMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(fieldBeginYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                                .addComponent(fieldEndMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(fieldEndYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldType, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                                .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
+                                .addComponent(fieldStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btFindHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                .addContainerGap())
+        );
+        pnlCardHistoryLayout.setVerticalGroup(
+            pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardHistoryLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(jLabel24)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabel26))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fieldEndYear, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldEndMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldBeginYear, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldBeginMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldType, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btFindHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(36, Short.MAX_VALUE))
+        );
+
+        fieldYear3.setSelectedIndex(105);
+        fieldYear3.setSelectedIndex(105);
+
+        pnlCard.add(pnlCardHistory, "History");
+
         jLabel6.setBackground(new java.awt.Color(153, 255, 255));
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(153, 153, 153));
@@ -1295,6 +1438,10 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btHistoryActionPerformed
         // TODO add your handling code here:
+        LocalDate now = LocalDate.now();
+        fieldBeginMonth.setSelectedIndex(0); fieldBeginYear.setSelectedIndex(2005 - 1900);
+        fieldEndMonth.setSelectedIndex(now.getMonthValue() - 1); fieldEndYear.setSelectedIndex(now.getYear() - 1900);
+        
         cardLayout3.show(pnlCard, "History");
     }//GEN-LAST:event_btHistoryActionPerformed
 
@@ -1310,7 +1457,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private void btMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMoneyActionPerformed
         // TODO add your handling code here:
         txtDrawAmount.setValue(null); txtDrawDescription.setText(myAccount.getFullName() + " rut tien");
-        txtDepositAmount.setValue(null); txtDepositDescription.setText(myAccount.getFullName() + " gui tien"); 
+        txtDepositAmount.setValue(null); txtDepositDescription.setText(myAccount.getFullName() + " nap tien"); 
         cardLayout3.show(pnlCard, "cardMoney");
     }//GEN-LAST:event_btMoneyActionPerformed
 
@@ -1587,17 +1734,17 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void txtDepositAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepositAmountActionPerformed
         // TODO add your handling code here:
+        
+    }//GEN-LAST:event_txtDepositAmountActionPerformed
+
+    private void btDeposit3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeposit3ActionPerformed
+        // TODO add your handling code here:
         if(txtDepositAmount.getValue() == null || Long.valueOf(txtDepositAmount.getValue().toString()) < 1000){
             JOptionPane.showMessageDialog(this, "Amount is not valid!", 
                     "", JOptionPane.WARNING_MESSAGE);
             return;
         }
         Long amount = Long.valueOf(txtDepositAmount.getValue().toString());
-        if(amount > myAccount.getBalace()){
-            JOptionPane.showMessageDialog(this, "Your account balance is too low for this transaction!", 
-                    "", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
         if(txtDepositDescription.getText().trim().isEmpty()){
             JOptionPane.showMessageDialog(this, "Please enter the transfer description!", 
                     "", JOptionPane.WARNING_MESSAGE);
@@ -1622,12 +1769,50 @@ public class FormCustomer extends javax.swing.JFrame {
         }
         else
             JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
-    }//GEN-LAST:event_txtDepositAmountActionPerformed
-
-    private void btDeposit3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeposit3ActionPerformed
-        // TODO add your handling code here:
-        
     }//GEN-LAST:event_btDeposit3ActionPerformed
+
+    private void fieldBeginMonthFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldBeginMonthFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldBeginMonthFocusLost
+
+    private void fieldBeginYearFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldBeginYearFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldBeginYearFocusLost
+
+    private void fieldEndYearFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldEndYearFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldEndYearFocusLost
+
+    private void fieldEndMonthFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldEndMonthFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldEndMonthFocusLost
+
+    private void btFindHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFindHistoryActionPerformed
+        // TODO add your handling code here:
+        historyTableModel.setRowCount(0); 
+        List<Transaction> lst = transController.filterTransactions(myAccount.getId(), 
+                fieldBeginMonth.getSelectedIndex() + 1, fieldBeginYear.getSelectedIndex() + 1900,
+                fieldEndMonth.getSelectedIndex() + 1, fieldEndYear.getSelectedIndex() + 1900, 
+                fieldType.getSelectedItem().toString(), fieldStatus.getSelectedItem().toString());
+        DateTimeFormatter fm = DateTimeFormatter.ofPattern("dd/MM/yy hh:mm");
+                
+        for(Transaction x : lst){
+            String c;
+            LocalDateTime time;
+            if(x.getSenderID() == null){ c = "+"; time = x.getReceiveTime();}
+            else if(x.getReceiverID() == null){ c = "-"; time = x.getSendTime();}
+            else{
+                if(x.getSenderID().equals(myAccount.getId())){ c = "-"; time = x.getSendTime();}
+                else{ c = "+"; time = x.getReceiveTime();}
+            }
+            if(!x.getStatus().equals("SUCCESSFUL")) c = "";
+            String timeShow;
+            if(time == null) timeShow = null;
+            else timeShow = time.format(fm);
+            historyTableModel.addRow(new Object[]{x.getTransID(), c + numberFormat.format(x.getAmount()), 
+                x.getType(), x.getStatus(), timeShow, x.getDescription()}); 
+        }
+    }//GEN-LAST:event_btFindHistoryActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1651,7 +1836,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "nhanprovip37@gmail.com";
+        String email = "11@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }
@@ -1662,6 +1847,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JButton btDeposit3;
     private javax.swing.JButton btEyePass3;
     private javax.swing.JRadioButton btFemale3;
+    private javax.swing.JButton btFindHistory;
     private javax.swing.JButton btHistory;
     private javax.swing.JButton btHome;
     private javax.swing.JButton btLogout;
@@ -1683,8 +1869,14 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JButton btTransfer;
     private javax.swing.JButton btTransfer3;
     private javax.swing.JButton btWithdraw3;
+    private javax.swing.JComboBox<String> fieldBeginMonth;
+    private javax.swing.JComboBox<String> fieldBeginYear;
     private javax.swing.JComboBox<String> fieldDay3;
+    private javax.swing.JComboBox<String> fieldEndMonth;
+    private javax.swing.JComboBox<String> fieldEndYear;
     private javax.swing.JComboBox<String> fieldMonth3;
+    private javax.swing.JComboBox<String> fieldStatus;
+    private javax.swing.JComboBox<String> fieldType;
     private javax.swing.JComboBox<String> fieldYear3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1701,6 +1893,10 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1710,6 +1906,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lblAccNumber3;
     private javax.swing.JLabel lblBalance3;
     private javax.swing.JLabel lblEmail3;

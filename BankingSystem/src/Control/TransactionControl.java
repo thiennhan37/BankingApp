@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
 /**
  *
  * @author Hi
@@ -56,5 +58,11 @@ public class TransactionControl {
         }
         return 0;
     }
-
+    
+    public List<Transaction> filterTransactions(String id, int beginMonth, int beginYear, int endMonth, int endYear, String type, String status){
+        LocalDateTime beginTime = LocalDateTime.of(beginYear, beginMonth, 1, 0, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(endYear, endMonth, 1, 0, 0, 0).plusMonths(1);
+        return transDAO.filterTransaction(id, beginTime, endTime, type, status);
+    }
+            
 }

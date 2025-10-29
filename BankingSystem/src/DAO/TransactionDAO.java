@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -107,5 +108,97 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result > 0;
     }
-
+    
+    public List<Transaction> filterTransaction(String id, LocalDateTime beginTime, LocalDateTime endTime, String type, String status){
+        Connection c = MyDatabase.getConnection();
+        List<Transaction> result = new ArrayList<>();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try{
+            String command, addStatus = "";
+            if(status.equals("SUCCESSFUL")) addStatus = " AND status = 'SUCCESSFUL'";
+            else if(status.equals("PENDING")) addStatus = " AND status = 'PENDING'";
+            else if(status.equals("FAILED")) addStatus = " AND status = 'FAILED'";
+            if(type.equals("ALL")){
+                command = "SELECT * FROM transactions WHERE "
+                + "( (? = senderID AND sendTime >= ? AND sendTime < ?) "
+                + "OR (? = receiverID AND ((type = 'DEPOSIT' AND receiveTime IS NULL) OR (receiveTime >= ? AND receiveTime < ?)) ) )";
+                command += addStatus;
+                
+                // System.out.println(command);
+                statement = c.prepareStatement(command);
+                statement.setString(1, id);
+                statement.setTimestamp(2, Timestamp.valueOf(beginTime)); 
+                statement.setTimestamp(3, Timestamp.valueOf(endTime));
+                statement.setString(4, id);
+                statement.setTimestamp(5, Timestamp.valueOf(beginTime));
+                statement.setTimestamp(6, Timestamp.valueOf(endTime)); 
+            }
+            else if(type.equals("TRANSFER")){
+                command = "SELECT * FROM transactions WHERE type = ? "
+                + "AND ((senderID = ? AND sendTime >= ? AND sendTime < ?) OR (receiverID = ? AND receiveTime >= ? AND receiveTime < ?))";
+                command += addStatus;
+                
+                statement = c.prepareStatement(command);
+                statement.setString(1, type);
+                statement.setString(2, id);
+                statement.setTimestamp(3, Timestamp.valueOf(beginTime)); 
+                statement.setTimestamp(4, Timestamp.valueOf(endTime));
+                statement.setString(5, id);
+                statement.setTimestamp(6, Timestamp.valueOf(beginTime));
+                statement.setTimestamp(7, Timestamp.valueOf(endTime)); 
+            }
+            else if(type.equals("WITHDRAW")){
+                command = "SELECT * FROM transactions WHERE type = ? "
+                        + "AND (senderID = ? AND sendTime >= ? AND sendTime < ?)";
+                command += addStatus;
+                
+                statement = c.prepareStatement(command);
+                statement.setString(1, type);
+                statement.setString(2, id);
+                statement.setTimestamp(3, Timestamp.valueOf(beginTime)); 
+                statement.setTimestamp(4, Timestamp.valueOf(endTime));
+            }
+            else{
+                // System.out.println(type + " " + id);
+                command = "SELECT * FROM transactions WHERE type = ? "
+                + "AND receiverID = ? AND ((type = 'DEPOSIT' AND receiveTime IS NULL) OR (receiveTime >= ? AND receiveTime < ?))";
+                command += addStatus;
+                
+                // System.out.println(beginTime.toString() + "\n" + endTime.toString());
+                statement = c.prepareStatement(command);
+                statement.setString(1, type);
+                statement.setString(2, id);
+                statement.setTimestamp(3, Timestamp.valueOf(beginTime)); 
+                statement.setTimestamp(4, Timestamp.valueOf(endTime));
+            }
+            
+            rs = statement.executeQuery();
+            while(rs.next()){
+                Transaction x = new Transaction();
+                x.setTransID(rs.getString("transID")); 
+                x.setSenderID(rs.getString("senderID"));
+                x.setReceiverID(rs.getString("receiverID"));
+                x.setAmount((Long)rs.getLong("amount"));
+                x.setType(rs.getString("type"));
+                x.setStatus(rs.getString("status")); 
+                x.setSendTime(rs.getTimestamp("sendTime").toLocalDateTime());
+                if(rs.getTimestamp("receiveTime") != null){
+                    x.setReceiveTime(rs.getTimestamp("receiveTime").toLocalDateTime());
+                }
+                else x.setReceiveTime(null); 
+                x.setDescription(rs.getString("description"));
+                result.add(x);
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{ if(statement != null) statement.close();} catch(SQLException ex){}
+            try{ if(rs != null) rs.close();} catch(SQLException ex){}
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
 }
