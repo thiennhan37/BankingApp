@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  *
  * @author Hi
  */
-public class Transaction {
+public class Transaction implements Comparable<Transaction>{
     public static int number = TransactionDAO.getInstance().countTransaction();
     private String transID, senderID, receiverID;
     private Long amount;
@@ -124,6 +124,12 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public int compareTo(Transaction o) {
+        return -transID.compareTo(o.transID);
+                
     }
     
     

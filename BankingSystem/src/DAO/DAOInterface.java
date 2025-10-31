@@ -19,8 +19,8 @@ public interface DAOInterface<T> {
             
     public int countObjects(String type);
     public T getObjectByEmail(String email);
-    public T getObjectByID(String id, String type);
+    public T getObjectByID(String id);
     public boolean checkExistObject(String email);
     public ArrayList<Account> showAll();
-
+    public boolean updateActiveObject(String id, boolean active);
 }

@@ -39,12 +39,15 @@ public class Staff extends Account{
     }
 
     @Override
-    public String getType() {return "Customer";}
+    public String getType() {return "Staff";}
     
     @Override
     public Long getBalace() {
         return null;
     }
+    @Override
+    public int getDegree(){ return 1;}
+        
     
     
 }

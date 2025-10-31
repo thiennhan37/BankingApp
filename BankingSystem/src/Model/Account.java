@@ -28,7 +28,7 @@ public abstract class Account {
     public abstract String getType();
     public abstract Long getBalace();
     public abstract String getBranch();
-    
+    public abstract int getDegree();
     public void Login(){
         
     }

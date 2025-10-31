@@ -45,6 +45,8 @@ public class FormLogin extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         setFormRegister();
         setRoundButton();
+        btEyePass1.doClick(); btEyePass2.doClick();
+        
     }
     public void setRoundButton(){
         
@@ -608,8 +610,12 @@ public class FormLogin extends javax.swing.JFrame {
             lblWarn2.setText("Password does not match");
             return;
         }
-        if(controller.checkExistedAccount(email)){
-            lblWarn2.setText("Account already exists");
+        Account x = controller.getAccountByEmail(email);
+        if(x != null){
+            if(x.isActive()) lblWarn2.setText("Account already exists");
+            else{
+                JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
+            }
             return;
         }
         if(!new OTPDialog(this, email, "xác thực tài khoản").isMatch()){
@@ -738,11 +744,15 @@ public class FormLogin extends javax.swing.JFrame {
             return;
         }
         Account ac = controller.getAccountByEmail(email);
-        if(ac == null){
+        if(ac == null || !ac.getPassword().equals(password)){
             lblWarn1.setText("Wrong Email Or Password");
             Timer clearWarning = new Timer(1000, e -> lblWarn1.setText(""));
             clearWarning.setRepeats(false);
             clearWarning.start();
+            return;
+        }
+        if(!ac.isActive()){
+            JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
             return;
         }
         // JOptionPane.showMessageDialog(this, "login successfully", "", JOptionPane.INFORMATION_MESSAGE);
@@ -750,7 +760,9 @@ public class FormLogin extends javax.swing.JFrame {
         if(ac.getType().equals("Customer")){
             new FormCustomer(email).setVisible(true);
         }
-         
+        else{
+            new FormStaff(email).setVisible(true);
+        }
     }//GEN-LAST:event_btLogin1ActionPerformed
 
     private void txtFullName2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullName2ActionPerformed

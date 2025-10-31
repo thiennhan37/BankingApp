@@ -13,7 +13,10 @@ package Process;
 import Control.AccountControl;
 import Model.Account;
 import DAO.AccountDAO;
+import DAO.TransactionDAO;
 import Model.Customer;
+import Model.Transaction;
+import View.FormTransaction;
 import View.OTPDialog;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -23,6 +26,7 @@ import javax.swing.*;
 import View.OTPDialog;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class testAccount {
 
@@ -54,9 +58,11 @@ public class testAccount {
 //        x.setLocationRelativeTo(null);
 //        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        x.setVisible(true);
-        LocalDate date = LocalDate.parse("2005-07-03");
-        Account ac = new Customer("999007", "ac", "ac", "nhanthien", "Male", date , true, (long)0);
-        AccountDAO.getInstance().updateObjectPass(ac);
-        
+
+//        JOptionPane.showMessageDialog(null, "Activate account failed!", 
+//                    "", JOptionPane.ERROR_MESSAGE);
+        Transaction x = TransactionDAO.getInstance().filterTransaction("999007", LocalDateTime.now().minusMonths(1),
+                LocalDateTime.now(), "ALL", "ALL").get(0);
+        new FormTransaction(x.getAmount(), x.getSenderID(), x.getReceiverID(),  x.getDescription(), x.getSendTime());
     }
 }

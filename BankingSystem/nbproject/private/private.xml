@@ -4,11 +4,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormCustomer.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormLogin.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Control/TransactionControl.java</file>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/DAO/TransactionDAO.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/DAO/AccountDAO.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormStaff.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Control/StaffControl.java</file>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Model/Transaction.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/DAO/AccountDAO.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Model/Staff.java</file>
         </group>
     </open-files>
 </project-private>

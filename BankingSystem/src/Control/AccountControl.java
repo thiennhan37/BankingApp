@@ -18,7 +18,6 @@ public class AccountControl {
     private AccountDAO accountDAO;
     private FormCustomer formCustomer;
     private FormStaff formStaff;
-    
     public AccountControl(FormLogin formLogin) {
         this.formLogin = formLogin;
         this.accountDAO = AccountDAO.getInstance();
@@ -43,13 +42,17 @@ public class AccountControl {
     public Account getAccountByEmail(String email){
         return accountDAO.getObjectByEmail(email) ; 
     }
-    public Account getAccountByID(String id, String type){
-        return accountDAO.getObjectByID(id, type);
+    public Account getAccountByID(String id){
+        return accountDAO.getObjectByID(id);
     } 
     public void updateObjectInfor(Account ac){
         accountDAO.updateObjectInfor(ac);
     }
     public void updateObjectPass(Account ac){
         accountDAO.updateObjectPass(ac); 
+    }
+    
+    public boolean updateObjectActive(String id, boolean active){
+        return accountDAO.updateActiveObject(id, active);
     }
 }

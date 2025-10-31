@@ -139,14 +139,15 @@ public class AccountDAO implements DAOInterface<Account>{
         String id, fullName, password, gender;
         LocalDate birthDay;
         boolean active;
+        PreparedStatement statement = null; ResultSet rs = null;
         try{
             String command = "SELECT * FROM accounts WHERE email = ?";
-            PreparedStatement statement = connect.prepareStatement(command);
+            statement = connect.prepareStatement(command);
             statement.setString(1, email);
-            ResultSet rs = statement.executeQuery(); 
+            rs = statement.executeQuery(); 
             if(rs.next() == false){
                 // System.out.println("nhan");
-                return ac;
+                throw new SQLException();
             }
             // rs.next();
             id = rs.getString("id"); 
@@ -155,18 +156,28 @@ public class AccountDAO implements DAOInterface<Account>{
             birthDay = rs.getDate("birthDay").toLocalDate();
             active = rs.getBoolean("active");
             String type = rs.getString("type"); 
+            // System.out.println(type);
             if(type.equals("Customer")){
                 Long balance = rs.getLong("balance");
                 ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
             }
             else if(type.equals("Staff")){
+                // System.out.println("sss");
                 String branch = rs.getString("branch");
                 ac = new Staff(id, fullName, email, password, gender, birthDay, active, branch);
             }
         }
         catch(SQLException e){
-            e.printStackTrace();
+            // e.printStackTrace();
         }
+        finally{
+            if(statement != null){
+                try{statement.close();}catch(SQLException ex){}
+            }
+            if(rs != null){
+                try{rs.close();}catch(SQLException ex){}
+            }
+        } 
         MyDatabase.closeConnection(connect);
         return ac;
     }
@@ -208,17 +219,19 @@ public class AccountDAO implements DAOInterface<Account>{
     }
 
     @Override
-    public Account getObjectByID(String id, String type) {
+    public Account getObjectByID(String id) {
         Connection connect = MyDatabase.getConnection();
         Account ac  = null; 
-        String email, fullName, password, gender;
+        String email, fullName, password, gender, type;
         LocalDate birthDay;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
         boolean active;
         try{
             String command = "SELECT * FROM accounts WHERE id = ?";
-            PreparedStatement statement = connect.prepareStatement(command);
+            statement = connect.prepareStatement(command);
             statement.setString(1, id);
-            ResultSet rs = statement.executeQuery(); 
+            rs = statement.executeQuery(); 
             if(rs.next() == false){
                 return ac;
             }
@@ -227,6 +240,7 @@ public class AccountDAO implements DAOInterface<Account>{
             birthDay = rs.getDate("birthDay").toLocalDate();
             active = rs.getBoolean("active");
             email = rs.getString("email");
+            type = rs.getString("type");
             if(type.equals("Customer")){
                 Long balance = rs.getLong("balance");
                 ac = new Customer(id, fullName, email, password, gender, birthDay, active, balance);
@@ -237,7 +251,16 @@ public class AccountDAO implements DAOInterface<Account>{
             }
         }
         catch(SQLException e){
-            e.printStackTrace();
+            
+            // e.printStackTrace();
+        }
+        finally{
+            if(statement != null){
+                try{statement.close();} catch(SQLException ex){}
+            }
+            if(rs != null){
+                try{rs.close();} catch(SQLException ex){}
+            }
         }
         MyDatabase.closeConnection(connect);
         return ac;
@@ -266,4 +289,28 @@ public class AccountDAO implements DAOInterface<Account>{
         return false;
     }
     
+    @Override
+    public boolean updateActiveObject(String id, boolean active){
+        Connection connect = MyDatabase.getConnection();
+        PreparedStatement statement = null;
+        int result;
+        try{
+            String command = "UPDATE accounts SET active = ? WHERE id = ?";
+            statement = connect.prepareStatement(command);
+            statement.setBoolean(1, active);
+            statement.setString(2, id);
+            result = statement.executeUpdate();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+        finally{
+            if(statement != null){
+                try{statement.close();} catch(SQLException ex){}
+            }
+        }
+        MyDatabase.closeConnection(connect); 
+        return result > 0;
+    }
 }

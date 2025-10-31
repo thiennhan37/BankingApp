@@ -31,6 +31,9 @@ public class Customer extends Account{
     public Long getBalace() { return balance; }
     @Override
     public String getBranch() { return null; }
+    @Override
+    public int getDegree(){ return 0;}
+        
     
     
 }

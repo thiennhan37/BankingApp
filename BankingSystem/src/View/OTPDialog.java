@@ -66,7 +66,7 @@ public class OTPDialog extends JDialog{
         
         
         serverOTP = SendMail.sendVerificationCode(toEmail, typeMess);
-        ttl = new Timer(1 * 60 * 1000, lbd -> serverOTP = null);
+        ttl = new Timer(5 * 60 * 1000, lbd -> serverOTP = null);
         ttl.setRepeats(false);
         ttl.start();
         
@@ -86,7 +86,7 @@ public class OTPDialog extends JDialog{
             resendButton.setEnabled(false);
             serverOTP = SendMail.sendVerificationCode(toEmail, typeMess);
             if(ttl != null) ttl.stop();
-            ttl = new Timer(1 * 60 * 1000, lbd -> serverOTP = null);
+            ttl = new Timer(5 * 60 * 1000, lbd -> serverOTP = null);
             ttl.setRepeats(false);
             ttl.start();
             

@@ -27,11 +27,13 @@ public class StaffControl {
             if(type.equals("TRANSFER")){
                 if(!accDAO.updateBalance(c, senderID, -amount)) throw new Exception("Cannot update sender balance");
                 if(!accDAO.updateBalance(c, receiverID, amount)) throw new Exception("Cannot update receiver balance");
+                
                 if(!transDAO.updateStatus(transID, "SUCCESSFUL")) throw new Exception("Cannot update status");
                 transDAO.updateReceiveTime(transID, LocalDateTime.now());
             }
             else if(type.equals("DEPOSIT")){
                 if(!accDAO.updateBalance(c, receiverID, amount)) throw new Exception("Cannot update receiver balance");
+                
                 if(!transDAO.updateStatus(transID, "SUCCESSFUL")) throw new Exception("Cannot update status");
                 transDAO.updateReceiveTime(transID, LocalDateTime.now());
             }

@@ -19,6 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.util.List;
 import java.util.Locale;
@@ -52,8 +55,9 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon closeEyeImage = new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"));
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
+    private ImageIcon FemalePerson = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
     private DefaultTableModel historyTableModel;
-    private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));;
+    private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
@@ -70,6 +74,7 @@ public class FormCustomer extends javax.swing.JFrame {
         
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
+        if(myAccount.getGender().equals("Female")) lblProfile.setIcon(FemalePerson);
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
         historyTableModel = (DefaultTableModel) tblHistory.getModel();
@@ -81,6 +86,7 @@ public class FormCustomer extends javax.swing.JFrame {
         setAmountText(txtDepositAmount, new JButton[]{btSADeposit1, btSADeposit2, btSADeposit3});
         
         setTextForNumber(txtTransTo); 
+        btHome.doClick();
         this.setResizable(false);
         this.setLocationRelativeTo(null);
          
@@ -124,12 +130,12 @@ public class FormCustomer extends javax.swing.JFrame {
 
         );
         TableColumnModel columnModel = tblHistory.getColumnModel();
-        columnModel.getColumn(5).setPreferredWidth(140);
+        columnModel.getColumn(5).setPreferredWidth(130);
         columnModel.getColumn(4).setPreferredWidth(60);
         columnModel.getColumn(3).setPreferredWidth(50);
         columnModel.getColumn(2).setPreferredWidth(40);
-        columnModel.getColumn(1).setPreferredWidth(50);
-        columnModel.getColumn(0).setPreferredWidth(40);
+        columnModel.getColumn(1).setPreferredWidth(60);
+        columnModel.getColumn(0).setPreferredWidth(30);
 //        columnModel.getColumn(1).setPreferredWidth(45); 
 //        columnModel.getColumn(2).setPreferredWidth(30);
 
@@ -482,7 +488,7 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lblAccNumber3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblBalance3, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)))
-                    .addComponent(lblFullName3, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
+                    .addComponent(lblFullName3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btReset3)
                 .addGap(16, 16, 16))
@@ -524,7 +530,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         btProfile.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btProfile.setForeground(new java.awt.Color(51, 51, 51));
-        btProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Information.png"))); // NOI18N
+        btProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/information.png"))); // NOI18N
         btProfile.setText("  Profile");
         btProfile.setBorderPainted(false);
         btProfile.addActionListener(new java.awt.event.ActionListener() {
@@ -577,14 +583,14 @@ public class FormCustomer extends javax.swing.JFrame {
 
         btStatics.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btStatics.setForeground(new java.awt.Color(51, 51, 51));
-        btStatics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/statics.png"))); // NOI18N
+        btStatics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/chart.png"))); // NOI18N
         btStatics.setText("  Statics  ");
         btStatics.setBorderPainted(false);
         pnlMenu.add(btStatics);
 
         lblProfile.setBackground(new java.awt.Color(153, 255, 255));
         lblProfile.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/profile.png"))); // NOI18N
+        lblProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/MalePerson.png"))); // NOI18N
         lblProfile.setOpaque(true);
 
         lblLineRow1.setBackground(new java.awt.Color(0, 0, 0));
@@ -654,14 +660,12 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlCardHomeLayout.setHorizontalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addGroup(pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardHomeLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addGap(1, 1, 1)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlCardHomeLayout.setVerticalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -932,7 +936,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addGroup(pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlSubProfile2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlSubProfile1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         pnlCardProfileLayout.setVerticalGroup(
             pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1373,7 +1377,6 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(153, 153, 153));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("9999@gmail.com");
         jLabel6.setOpaque(true);
 
         jLabel17.setBackground(new java.awt.Color(0, 0, 0));
@@ -1384,27 +1387,23 @@ public class FormCustomer extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlMenu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblLineRow2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblLineRow2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblProfile, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblLineCol1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(lblLineCol2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblLineCol1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(0, 0, 0)
+                            .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1413,7 +1412,7 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(0, 0, 0)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -1425,7 +1424,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
+                        .addGap(1, 1, 1)
                         .addComponent(lblLineRow2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1443,7 +1442,7 @@ public class FormCustomer extends javax.swing.JFrame {
         LocalDate now = LocalDate.now();
         fieldBeginMonth.setSelectedIndex(0); fieldBeginYear.setSelectedIndex(2005 - 1900);
         fieldEndMonth.setSelectedIndex(now.getMonthValue() - 1); fieldEndYear.setSelectedIndex(now.getYear() - 1900);
-        
+        btFindHistory.doClick();
         cardLayout3.show(pnlCard, "History");
     }//GEN-LAST:event_btHistoryActionPerformed
 
@@ -1639,7 +1638,7 @@ public class FormCustomer extends javax.swing.JFrame {
                     "", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        Account toAccount = accController.getAccountByID(txtTransTo.getText(), "Customer");
+        Account toAccount = accController.getAccountByID(txtTransTo.getText());
         if(toAccount == null || toAccount.getId().equals(myAccount.getId())){ 
             JOptionPane.showMessageDialog(this, "Account is not valid!", "", JOptionPane.WARNING_MESSAGE);
             return;
@@ -1671,19 +1670,19 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(myAccount.getId(), toAccount.getId(), 
                 amount, "TRANSFER", txtTransDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Transfer successfully", "", JOptionPane.INFORMATION_MESSAGE);
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Transfer failed", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btTransfer3ActionPerformed
 
     private void txtTransToFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTransToFocusLost
         // TODO add your handling code here:
-        Account toAccount = accController.getAccountByID(txtTransTo.getText(), "Customer");
+        Account toAccount = accController.getAccountByID(txtTransTo.getText());
         if(toAccount != null){
             lblToName.setText("  " + toAccount.getFullName());
         }
@@ -1725,14 +1724,14 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(myAccount.getId(), null, 
                 amount, "WITHDRAW", txtDrawDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Withdraw successfully", "", JOptionPane.INFORMATION_MESSAGE);
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Withdraw failed", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btWithdraw3ActionPerformed
 
     private void txtDepositAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepositAmountActionPerformed
@@ -1764,14 +1763,14 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(null, myAccount.getId(), 
                 amount, "DEPOSIT", txtDepositDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "thanh cong", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Deposit successfully", "", JOptionPane.INFORMATION_MESSAGE);
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "dang xu li", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "that bai", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Deposit failed", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btDeposit3ActionPerformed
 
     private void fieldBeginMonthFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldBeginMonthFocusLost
@@ -1797,8 +1796,8 @@ public class FormCustomer extends javax.swing.JFrame {
                 fieldBeginMonth.getSelectedIndex() + 1, fieldBeginYear.getSelectedIndex() + 1900,
                 fieldEndMonth.getSelectedIndex() + 1, fieldEndYear.getSelectedIndex() + 1900, 
                 fieldType.getSelectedItem().toString(), fieldStatus.getSelectedItem().toString());
-        DateTimeFormatter fm = DateTimeFormatter.ofPattern("dd/MM/yy hh:mm");
-                
+        DateTimeFormatter fm = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+        Collections.sort(lst);
         for(Transaction x : lst){
             String c;
             LocalDateTime time;
@@ -1839,7 +1838,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "nhanprovip37@gmail.com";
+        String email = "duyen11@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }
