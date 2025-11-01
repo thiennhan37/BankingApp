@@ -88,7 +88,6 @@ public class FormStaff extends javax.swing.JFrame {
         setRestrict();
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-         
     } 
     private void settingGUIComponent(){
         JComponent[] btArr = {btSaveInfo3, btChangePass3};

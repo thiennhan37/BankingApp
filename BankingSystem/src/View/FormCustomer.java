@@ -6,6 +6,7 @@ package View;
 
 import Control.AccountControl;
 import Control.TransactionControl;
+import DAO.TransactionDAO;
 import Model.Account;
 import Model.Transaction;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -33,6 +34,13 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.labels.StandardPieToolTipGenerator;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
 
 /**
  *
@@ -57,6 +65,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private ImageIcon FemalePerson = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
     private DefaultTableModel historyTableModel;
+    private DefaultPieDataset datasetPie1, datasetPie2;
     private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
@@ -84,8 +93,8 @@ public class FormCustomer extends javax.swing.JFrame {
         setAmountText(txtTransAmount, new JButton[]{btSATrans1, btSATrans2, btSATrans3});
         setAmountText(txtDrawAmount, new JButton[]{btSADraw1, btSADraw2, btSADraw3});
         setAmountText(txtDepositAmount, new JButton[]{btSADeposit1, btSADeposit2, btSADeposit3});
-        
         setTextForNumber(txtTransTo); 
+        addForStat();
         btHome.doClick();
         this.setResizable(false);
         this.setLocationRelativeTo(null);
@@ -114,15 +123,6 @@ public class FormCustomer extends javax.swing.JFrame {
            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
         
-//        tblHistory.putClientProperty("FlatLaf.style", ""
-//            + "rowHeight: 28;"
-//            + "showHorizontalLines:true;"
-//            + "showVerticalLines:true;"
-//            + "selectionBackground:#E0F7FA;"
-//            + "selectionForeground:#004D40;"
-//            + "gridColor:#B0BEC5;"
-//            + "font: 14 Roboto;"
-//        );
         JTableHeader header = tblHistory.getTableHeader();
         header.putClientProperty("FlatLaf.style", ""
                 + "background: #99FFFF;"
@@ -143,6 +143,10 @@ public class FormCustomer extends javax.swing.JFrame {
         header.setReorderingAllowed(false); // không cho kéo đổi thứ tự cột
         header.setResizingAllowed(true); // có thể cho resize nếu muốn
         
+        datasetPie1 = new DefaultPieDataset();
+        datasetPie2 = new DefaultPieDataset();
+        setPieChart(datasetPie1, pnlPie1, "Transaction Amount By Type");
+        setPieChart(datasetPie2, pnlPie2, "Transaction Quantity By Type");
     }   
     
     private void setMouseList(){
@@ -218,9 +222,7 @@ public class FormCustomer extends javax.swing.JFrame {
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
     }
-    private void loadHistoryTable(){
-        
-    }
+
     private void setTextForNumber(JFormattedTextField txtFormat){
         NumberFormat numFormat = NumberFormat.getNumberInstance();
         numFormat.setGroupingUsed(false); 
@@ -320,8 +322,102 @@ public class FormCustomer extends javax.swing.JFrame {
         }
     }
     
-    
-    
+    private void setPieChart(DefaultPieDataset dataset, JPanel pnlPie, String title){
+        dataset.setValue("Transfer", 10);
+        dataset.setValue("Withdraw", 20);
+        dataset.setValue("Deposit", 20);
+        
+        JFreeChart chart = ChartFactory.createPieChart(title, dataset, true, true, true);
+        if (chart.getLegend() != null) {
+            chart.getLegend().setItemFont(new Font("Times New Roman", Font.BOLD, 14));
+        }
+        chart.getTitle().setFont(new Font("Times New Roman", Font.BOLD, 18)); 
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setSectionPaint("Transfer", new Color(255, 255, 102));
+        plot.setSectionPaint("Withdraw", new Color(102, 255, 102));
+        plot.setSectionPaint("Deposit", new Color(255, 102, 153));
+
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+            "{2}"    // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
+        ));
+        plot.setToolTipGenerator(new StandardPieToolTipGenerator(
+            "{1}"   // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
+        ));
+        plot.setSimpleLabels(true);
+
+        plot.setLabelFont(new Font("Calibri", Font.BOLD, 14));
+        plot.setLabelBackgroundPaint(Color.WHITE);
+        plot.setBackgroundPaint(new Color(204, 255, 255));
+        plot.setInteriorGap(0.01);
+        
+        plot.setLabelBackgroundPaint(null);      // bỏ màu nền
+        plot.setLabelOutlinePaint(null);         // bỏ viền chữ nhật
+        plot.setLabelShadowPaint(null);
+        
+        ChartPanel chartPnl = new ChartPanel(chart);
+        chartPnl.setDisplayToolTips(true);
+        chartPnl.setMouseWheelEnabled(true); 
+        
+        
+        pnlPie.removeAll(); 
+        pnlPie.add(chartPnl, BorderLayout.CENTER);
+        pnlPie.validate();
+    }
+    private LocalDateTime beginCusSta= null;
+    private void addForStat(){
+        JButton[] btArr = {bt1Week, bt1Month, bt6Month, bt1Year, btAll};
+        
+        for(JButton x : btArr){
+            x.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    switch(x.getActionCommand()){
+                        case("1 Week") ->{
+                            beginCusSta = LocalDateTime.now().minusDays(7);
+                        }
+                        case("1 Month") ->{
+                            beginCusSta = LocalDateTime.now().minusMonths(1);
+                        }
+                        case("6 Month") ->{
+                            beginCusSta = LocalDateTime.now().minusMonths(6);
+                        }
+                        case("1 Year") ->{
+                            beginCusSta = LocalDateTime.now().minusYears(1);
+                        } 
+                        default ->{
+                            beginCusSta= null;
+                        }
+                    }
+                    List<Long> result = TransactionDAO.getInstance().staticsPieForCustomer(myAccount.getId(), beginCusSta);
+                    if(datasetPie1 != null) datasetPie1.clear(); 
+                    if(datasetPie2 != null) datasetPie2.clear();
+                    datasetPie1.setValue("Transfer", result.get(2));
+                    datasetPie1.setValue("Withdraw", result.get(4));
+                    datasetPie1.setValue("Deposit", result.get(0));
+                    
+                    datasetPie2.setValue("Transfer", result.get(3));
+                    datasetPie2.setValue("Withdraw", result.get(5));
+                    datasetPie2.setValue("Deposit", result.get(1));
+                    // System.out.println(x.getActionCommand());
+                    
+                }
+            });
+            
+            x.addFocusListener(new FocusListener(){
+                @Override
+                public void focusGained(FocusEvent e) {
+                    x.setBackground(color3);
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    x.setBackground(color1);
+                }
+                
+            });
+        }
+                   
+    }
     
     
     /**
@@ -358,7 +454,6 @@ public class FormCustomer extends javax.swing.JFrame {
         lblLineCol1 = new javax.swing.JLabel();
         lblLineRow2 = new javax.swing.JLabel();
         pnlCard = new javax.swing.JPanel();
-        pnlCardStatics = new javax.swing.JPanel();
         pnlCardHome = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -431,6 +526,14 @@ public class FormCustomer extends javax.swing.JFrame {
         btFindHistory = new javax.swing.JButton();
         fieldStatus = new javax.swing.JComboBox<>();
         jLabel26 = new javax.swing.JLabel();
+        pnlCardStatics = new javax.swing.JPanel();
+        pnlPie1 = new javax.swing.JPanel();
+        bt1Week = new javax.swing.JButton();
+        bt1Month = new javax.swing.JButton();
+        bt6Month = new javax.swing.JButton();
+        bt1Year = new javax.swing.JButton();
+        pnlPie2 = new javax.swing.JPanel();
+        btAll = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
 
@@ -586,6 +689,11 @@ public class FormCustomer extends javax.swing.JFrame {
         btStatics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/chart.png"))); // NOI18N
         btStatics.setText("  Statics  ");
         btStatics.setBorderPainted(false);
+        btStatics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btStaticsActionPerformed(evt);
+            }
+        });
         pnlMenu.add(btStatics);
 
         lblProfile.setBackground(new java.awt.Color(153, 255, 255));
@@ -635,19 +743,6 @@ public class FormCustomer extends javax.swing.JFrame {
         lblLineRow2.setOpaque(true);
 
         pnlCard.setLayout(new java.awt.CardLayout());
-
-        javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
-        pnlCardStatics.setLayout(pnlCardStaticsLayout);
-        pnlCardStaticsLayout.setHorizontalGroup(
-            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 592, Short.MAX_VALUE)
-        );
-        pnlCardStaticsLayout.setVerticalGroup(
-            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 492, Short.MAX_VALUE)
-        );
-
-        pnlCard.add(pnlCardStatics, "card7");
 
         pnlCardHome.setAlignmentX(0.0F);
 
@@ -843,8 +938,6 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        fieldYear3.setSelectedIndex(105);
-
         pnlSubProfile2.setBackground(new java.awt.Color(255, 255, 255));
         pnlSubProfile2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Password", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
 
@@ -936,7 +1029,7 @@ public class FormCustomer extends javax.swing.JFrame {
                 .addGroup(pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlSubProfile2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlSubProfile1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         pnlCardProfileLayout.setVerticalGroup(
             pnlCardProfileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1373,6 +1466,82 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardHistory, "History");
 
+        pnlCardStatics.setBackground(new java.awt.Color(255, 255, 255));
+
+        pnlPie1.setLayout(new java.awt.BorderLayout());
+
+        bt1Week.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Week.setForeground(new java.awt.Color(178, 137, 145));
+        bt1Week.setText("1 Week");
+        bt1Week.setFocusPainted(false);
+
+        bt1Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Month.setForeground(new java.awt.Color(178, 137, 145));
+        bt1Month.setText("1 Month");
+        bt1Month.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt1MonthActionPerformed(evt);
+            }
+        });
+
+        bt6Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt6Month.setForeground(new java.awt.Color(178, 137, 145));
+        bt6Month.setText("6 Month");
+
+        bt1Year.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Year.setForeground(new java.awt.Color(178, 137, 145));
+        bt1Year.setText("1 Year");
+
+        pnlPie2.setLayout(new java.awt.BorderLayout());
+
+        btAll.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btAll.setForeground(new java.awt.Color(178, 137, 145));
+        btAll.setText("ALL");
+
+        javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
+        pnlCardStatics.setLayout(pnlCardStaticsLayout);
+        pnlCardStaticsLayout.setHorizontalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(12, Short.MAX_VALUE))
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(bt1Week)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt6Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Year)
+                        .addGap(18, 18, 18)
+                        .addComponent(btAll)
+                        .addGap(77, 77, 77))))
+        );
+        pnlCardStaticsLayout.setVerticalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt6Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btAll, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(265, 265, 265))
+        );
+
+        pnlCard.add(pnlCardStatics, "Statics");
+
         jLabel6.setBackground(new java.awt.Color(153, 255, 255));
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(153, 153, 153));
@@ -1662,7 +1831,8 @@ public class FormCustomer extends javax.swing.JFrame {
         String passInput = JOptionPane.showInputDialog(this,
                                     "Please enter your password to confirm the transfer",
                                                     "", JOptionPane.QUESTION_MESSAGE);
-        if(passInput == null || !passInput.equals(myAccount.getPassword())){
+        if(passInput == null) return;
+        if(!passInput.equals(myAccount.getPassword())){
             JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
                     "", JOptionPane.WARNING_MESSAGE);
             return;
@@ -1671,6 +1841,8 @@ public class FormCustomer extends javax.swing.JFrame {
                 amount, "TRANSFER", txtTransDescription.getText());
         if(result == 1){
             JOptionPane.showMessageDialog(this, "Transfer successfully", "", JOptionPane.INFORMATION_MESSAGE);
+            new FormTransaction(myAccount.getFullName(), toAccount.getFullName(), amount, 
+                    txtTransDescription.getText(), LocalDateTime.now());
             resetAccount();
         }
         else if(result == -1){
@@ -1816,6 +1988,15 @@ public class FormCustomer extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btFindHistoryActionPerformed
 
+    private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
+        // TODO add your handling code here:
+        cardLayout3.show(pnlCard, "Statics");
+    }//GEN-LAST:event_btStaticsActionPerformed
+
+    private void bt1MonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt1MonthActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bt1MonthActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1845,6 +2026,11 @@ public class FormCustomer extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GenderGroup3;
+    private javax.swing.JButton bt1Month;
+    private javax.swing.JButton bt1Week;
+    private javax.swing.JButton bt1Year;
+    private javax.swing.JButton bt6Month;
+    private javax.swing.JButton btAll;
     private javax.swing.JButton btChangePass3;
     private javax.swing.JButton btDeposit3;
     private javax.swing.JButton btEyePass3;
@@ -1929,6 +2115,8 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JPanel pnlCardTransfer;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
+    private javax.swing.JPanel pnlPie1;
+    private javax.swing.JPanel pnlPie2;
     private javax.swing.JPanel pnlSubProfile1;
     private javax.swing.JPanel pnlSubProfile2;
     private javax.swing.JPanel pnlTop;

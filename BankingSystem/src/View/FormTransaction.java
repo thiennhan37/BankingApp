@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 /**
  *
@@ -34,7 +35,7 @@ public class FormTransaction extends javax.swing.JFrame {
     private Long amount;
     private DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
-    public FormTransaction(Long amount, String senderName, String receiverName, String description, LocalDateTime time) {
+    public FormTransaction(String senderName, String receiverName, Long amount, String description, LocalDateTime time) {
         try {
             FlatLightLaf.setup();
         } catch (Exception e) {
@@ -50,6 +51,7 @@ public class FormTransaction extends javax.swing.JFrame {
         // setGUIComponent();
         this.setLocationRelativeTo(null);
         this.setResizable(false); 
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
         
     }
@@ -94,7 +96,7 @@ public class FormTransaction extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(153, 255, 204));
+        jPanel1.setBackground(new java.awt.Color(153, 255, 255));
 
         lblDescription.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblDescription.setText("cccc ");
@@ -135,8 +137,9 @@ public class FormTransaction extends javax.swing.JFrame {
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("SUCCESSFUL TRANSACTION");
 
-        lblAmount.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblAmount.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblAmount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblAmount.setText("111.000 VND");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -163,9 +166,9 @@ public class FormTransaction extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(lblAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(15, 15, 15)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblSenderName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -185,7 +188,7 @@ public class FormTransaction extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTime, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                .addGap(29, 29, 29))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

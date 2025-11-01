@@ -10,59 +10,67 @@ package Process;
  * toi uu hien thi nhanh khi register
  * đơ UI khi bấm resend
  */
-import Control.AccountControl;
-import Model.Account;
-import DAO.AccountDAO;
-import DAO.TransactionDAO;
-import Model.Customer;
-import Model.Transaction;
-import View.FormTransaction;
-import View.OTPDialog;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+import Control.*;
+import DAO.*;
+import Model.*;
+import View.*;
+import com.formdev.flatlaf.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import javax.swing.*;
 import View.OTPDialog;
-import com.formdev.flatlaf.FlatDarculaLaf;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
 
+class PieChartExample extends JFrame {
+    public PieChartExample() {
+        // 1️⃣ Tạo dataset
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        dataset.setValue("Transfer", 45);
+        dataset.setValue("Withdraw", 30);
+        dataset.setValue("Deposit", 25);
+
+        // 2️⃣ Tạo chart
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Statics Transactions", // tiêu đề
+            dataset,              // dữ liệu
+            true, true, false     // có legend, tooltips, URLs
+        );
+
+        // 3️⃣ Hiển thị chart trên JFrame
+        ChartPanel panel = new ChartPanel(chart);
+        setContentPane(panel);
+
+        setTitle("My Chart");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+}
 public class testAccount {
 
     /**
      * @param args the command line arguments
      */
+    
     public static void main(String args[]) {
-//        JFrame x = new JFrame("nhan");
-//        JOptionPane.showInputDialog(x, "thong bao", "", JOptionPane.CLOSED_OPTION);
-//        System.exit(0); 
-        //x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         try {
             FlatLightLaf.setup();
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        UIManager.put("OptionPane.background", new Color(178,137,145));
-//        UIManager.put("RootPane.background", new Color(178,137,145));
-//        UIManager.put("OptionPane.messageForeground", Color.DARK_GRAY);
-//        // UIManager.put("RootPane.messageFont", new Font("Segoe UI", Font.BOLD, 25));
-//        // UIManager.put("RootPane.buttonFont", new Font("Segoe UI", Font.BOLD, 13));
-//        UIManager.put("OptionPane.messageFont", new Font("Segoe UI", Font.BOLD, 14));
-//        UIManager.put("OptionPane.buttonFont", new Font("Segoe UI", Font.BOLD, 13));
-//        UIManager.put("Button.arc", 15); // bo tròn nút OK/Cancel
-//        UIManager.put("Button.background", Color.WHITE); // màu xanh Google
-//        UIManager.put("Button.foreground", Color.BLACK);
-
-//        JFrame x = new JFrame();  
-//        x.setLocationRelativeTo(null);
-//        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        x.setVisible(true);
-
 //        JOptionPane.showMessageDialog(null, "Activate account failed!", 
 //                    "", JOptionPane.ERROR_MESSAGE);
-        Transaction x = TransactionDAO.getInstance().filterTransaction("999007", LocalDateTime.now().minusMonths(1),
-                LocalDateTime.now(), "ALL", "ALL").get(0);
-        new FormTransaction(x.getAmount(), x.getSenderID(), x.getReceiverID(),  x.getDescription(), x.getSendTime());
+//        Transaction x = TransactionDAO.getInstance().filterTransaction("999007", LocalDateTime.now().minusMonths(1),
+//                LocalDateTime.now(), "ALL", "ALL").get(0);
+//        new FormTransaction(x.getSenderID(), x.getReceiverID(), x.getAmount(),  x.getDescription(), x.getSendTime());
+        new PieChartExample();
+        
+        
+
     }
 }

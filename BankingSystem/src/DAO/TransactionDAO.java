@@ -254,4 +254,40 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result;
     }
+
+    public List<Long> staticsPieForCustomer(String id, LocalDateTime begin){
+        Connection c = MyDatabase.getConnection();
+        List<Long> result = new ArrayList<>();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try{
+            String add1 = "AND ? in (senderID, receiverID)";
+            String add2 = "AND sendTime > ?";
+            String command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
+                    + "WHERE true ";
+            if(id != null) command += add1;
+            if(begin != null) command += add2;
+            command += "GROUP BY type ORDER BY type";  
+            
+            statement = c.prepareStatement(command);
+            int cnt = 0;
+            if(id != null) statement.setString(++cnt, id);
+            if(begin != null) statement.setTimestamp(++cnt, Timestamp.valueOf(begin)); 
+            rs = statement.executeQuery();
+            while(rs.next()){
+                result.add(rs.getLong("tong"));
+                result.add(rs.getLong("sl"));
+            }
+
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{ if(statement != null) statement.close();} catch(SQLException ex){}
+            try{ if(rs != null) rs.close();} catch(SQLException ex){}
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
 }
