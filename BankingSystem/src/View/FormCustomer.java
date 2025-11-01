@@ -1888,7 +1888,8 @@ public class FormCustomer extends javax.swing.JFrame {
         String passInput = JOptionPane.showInputDialog(this,
                                     "Please enter your password to confirm the transfer",
                                                     "", JOptionPane.QUESTION_MESSAGE);
-        if(passInput == null || !passInput.equals(myAccount.getPassword())){
+        if(passInput == null) return;
+        if(!passInput.equals(myAccount.getPassword())){
             JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
                     "", JOptionPane.WARNING_MESSAGE);
             return;
@@ -1927,7 +1928,8 @@ public class FormCustomer extends javax.swing.JFrame {
         String passInput = JOptionPane.showInputDialog(this,
                                     "Please enter your password to confirm the transfer",
                                                     "", JOptionPane.QUESTION_MESSAGE);
-        if(passInput == null || !passInput.equals(myAccount.getPassword())){
+        if(passInput == null) return;
+        if(!passInput.equals(myAccount.getPassword())){
             JOptionPane.showMessageDialog(this, "Your password is incorrect!", 
                     "", JOptionPane.WARNING_MESSAGE);
             return;
