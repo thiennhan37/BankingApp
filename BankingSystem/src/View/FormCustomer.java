@@ -103,7 +103,7 @@ public class FormCustomer extends javax.swing.JFrame {
         setAmountText(txtDepositAmount, new JButton[]{btSADeposit1, btSADeposit2, btSADeposit3});
         setTextForNumber(txtTransTo); 
         addForStat();
-        btHome.doClick();
+        btAll.doClick(); btHome.doClick(); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
          
@@ -2067,7 +2067,6 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
         // TODO add your handling code here:
-        btAll.doClick();
         cardLayout3.show(pnlCard, "Statics");
     }//GEN-LAST:event_btStaticsActionPerformed
 
@@ -2097,7 +2096,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "duyen11@gmail.com";
+        String email = "nhanprovip37@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }

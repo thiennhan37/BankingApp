@@ -11,8 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -260,19 +260,35 @@ public class TransactionDAO {
         List<Long> result = new ArrayList<>();
         PreparedStatement statement = null;
         ResultSet rs = null;
+        if(begin == null) begin = LocalDateTime.of(1990, 1, 1, 0, 0, 0);
+        System.out.println(begin);
         try{
-            String add1 = "AND ? in (senderID, receiverID) ";
-            String add2 = "AND (sendTime > ? OR receiveTime > ?)";
-            String command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
-                    + "WHERE true ";
-            if(id != null) command += add1;
-            if(begin != null) command += add2;
-            command += "GROUP BY type ORDER BY type ";  
-            
+            String command;
+            if(id != null){
+                command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
+                    + "WHERE status = 'SUCCESSFUL' AND "
+                    + "( (type = 'TRANSFER' AND senderID = ? AND sendTime > ?) "
+                    + "OR (type = 'WITHDRAW' AND senderID = ? AND sendTime > ?) "
+                    + "OR (type = 'DEPOSIT' AND receiverID = ? AND receiveTime > ?) )"
+                    + "GROUP BY type ORDER BY type";
+            }
+            else{
+                command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
+                    + "WHERE status = 'SUCCESSFUL' AND ((sendTime > ?) OR (receiveTime > ?)) "
+                    + "GROUP BY type ORDER BY type ";
+            }
+
             statement = c.prepareStatement(command);
             int cnt = 0;
-            if(id != null) statement.setString(++cnt, id);
-            if(begin != null){
+            if(id != null){
+                statement.setString(++cnt, id); 
+                statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
+                statement.setString(++cnt, id); 
+                statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
+                statement.setString(++cnt, id); 
+                statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
+            }
+            else{
                 statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
                 statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
             } 
