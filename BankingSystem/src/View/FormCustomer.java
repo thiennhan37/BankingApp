@@ -37,9 +37,15 @@ import javax.swing.text.NumberFormatter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieToolTipGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 /**
@@ -66,7 +72,9 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon FemalePerson = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
     private DefaultTableModel historyTableModel;
     private DefaultPieDataset datasetPie1, datasetPie2;
-    private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+    private DefaultCategoryDataset datasetCategory;
+    private Locale myLocale = new Locale("vi", "VN");
+    private NumberFormat numberFormat = NumberFormat.getInstance(myLocale);
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
@@ -147,6 +155,9 @@ public class FormCustomer extends javax.swing.JFrame {
         datasetPie2 = new DefaultPieDataset();
         setPieChart(datasetPie1, pnlPie1, "Transaction Amount By Type");
         setPieChart(datasetPie2, pnlPie2, "Transaction Quantity By Type");
+        
+        datasetCategory = new DefaultCategoryDataset();
+        setCategoryChart();
     }   
     
     private void setMouseList(){
@@ -323,9 +334,9 @@ public class FormCustomer extends javax.swing.JFrame {
     }
     
     private void setPieChart(DefaultPieDataset dataset, JPanel pnlPie, String title){
-        dataset.setValue("Transfer", 10);
-        dataset.setValue("Withdraw", 20);
-        dataset.setValue("Deposit", 20);
+        dataset.setValue("Transfer", 1);
+        dataset.setValue("Withdraw", 1);
+        dataset.setValue("Deposit", 1);
         
         JFreeChart chart = ChartFactory.createPieChart(title, dataset, true, true, true);
         if (chart.getLegend() != null) {
@@ -341,7 +352,7 @@ public class FormCustomer extends javax.swing.JFrame {
             "{2}"    // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
         ));
         plot.setToolTipGenerator(new StandardPieToolTipGenerator(
-            "{1}"   // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
+            "{0} = {1}", myLocale    // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
         ));
         plot.setSimpleLabels(true);
 
@@ -419,7 +430,57 @@ public class FormCustomer extends javax.swing.JFrame {
                    
     }
     
-    
+    private void setCategoryChart(){ 
+        LocalDateTime now = LocalDateTime.now();
+        for(int i = 4; i >= 0; i--){
+            LocalDateTime x = now.minusMonths(i);
+            List<Long> lst = TransactionDAO.getInstance().staticsFor5Month(myAccount.getId(), x.getYear(), x.getMonthValue());
+            // System.out.println(x.getMonthValue() + " " + x.getYear());
+            datasetCategory.addValue(lst.get(0), "Income", x.getMonthValue()+ "/" + x.getYear());
+            datasetCategory.addValue(lst.get(1), "Expense", x.getMonthValue()+ "/" + x.getYear());
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Customer Income and Expense Summary", // Tiêu đề
+                "Date",                            // Trục X
+                "Total Amount(VND)",                    // Trục Y
+                datasetCategory,
+                PlotOrientation.VERTICAL,
+                true, true, false
+        );
+        
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        NumberFormat vnFormat = NumberFormat.getInstance(myLocale);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setNumberFormatOverride(vnFormat);
+        // Giao diện ban đầu
+        plot.setBackgroundPaint(new Color(204,255,255));
+        plot.setRangeGridlinePaint(Color.GRAY);
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(0, 153, 255));  // Thu
+        renderer.setSeriesPaint(1, new Color(255, 102, 102)); // Chi
+        
+       
+        plot.getDomainAxis().setCategoryMargin(0.4);
+        renderer.setItemMargin(0.0); 
+        
+        renderer.setDefaultToolTipGenerator(
+            new StandardCategoryToolTipGenerator("({0}, {1}) = {2} ", NumberFormat.getInstance(myLocale))
+        );
+        
+        chart.getTitle().setFont(new Font("Times New Roman", Font.BOLD, 18)); 
+        chart.getLegend().setItemFont(new Font("Times New Roman", Font.BOLD, 14)); 
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(350, 500));
+        
+        plot.getDomainAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        plot.getRangeAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        renderer.setDefaultItemLabelsVisible(true);
+        
+        pnlCategory.add(chartPanel, BorderLayout.CENTER);
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -534,6 +595,8 @@ public class FormCustomer extends javax.swing.JFrame {
         bt1Year = new javax.swing.JButton();
         pnlPie2 = new javax.swing.JPanel();
         btAll = new javax.swing.JButton();
+        pnlCategory = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
 
@@ -1498,6 +1561,9 @@ public class FormCustomer extends javax.swing.JFrame {
         btAll.setForeground(new java.awt.Color(178, 137, 145));
         btAll.setText("ALL");
 
+        pnlCategory.setBackground(new java.awt.Color(255, 255, 255));
+        pnlCategory.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
         pnlCardStatics.setLayout(pnlCardStaticsLayout);
         pnlCardStaticsLayout.setHorizontalGroup(
@@ -1505,11 +1571,6 @@ public class FormCustomer extends javax.swing.JFrame {
             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                        .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(12, Short.MAX_VALUE))
                     .addGroup(pnlCardStaticsLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(bt1Week)
@@ -1521,23 +1582,37 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addComponent(bt1Year)
                         .addGap(18, 18, 18)
                         .addComponent(btAll)
-                        .addGap(77, 77, 77))))
+                        .addGap(77, 77, 77))
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                                .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jTextField1)
+                            .addComponent(pnlCategory, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(12, Short.MAX_VALUE))))
         );
         pnlCardStaticsLayout.setVerticalGroup(
             pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bt6Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btAll, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt6Month, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(265, 265, 265))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlCategory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pnlCard.add(pnlCardStatics, "Statics");
@@ -1992,6 +2067,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
         // TODO add your handling code here:
+        btAll.doClick();
         cardLayout3.show(pnlCard, "Statics");
     }//GEN-LAST:event_btStaticsActionPerformed
 
@@ -2097,6 +2173,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblAccNumber3;
     private javax.swing.JLabel lblBalance3;
     private javax.swing.JLabel lblEmail3;
@@ -2115,6 +2192,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JPanel pnlCardProfile;
     private javax.swing.JPanel pnlCardStatics;
     private javax.swing.JPanel pnlCardTransfer;
+    private javax.swing.JPanel pnlCategory;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
     private javax.swing.JPanel pnlPie1;

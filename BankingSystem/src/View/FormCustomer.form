@@ -2188,12 +2188,6 @@
                       <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="pnlPie1" min="-2" pref="273" max="-2" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="pnlPie2" min="-2" pref="273" max="-2" attributes="0"/>
-                              <EmptySpace pref="12" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               <Component id="bt1Week" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -2206,6 +2200,18 @@
                               <Component id="btAll" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="77" max="-2" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="pnlPie1" min="-2" pref="273" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="pnlPie2" min="-2" pref="273" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="jTextField1" max="32767" attributes="0"/>
+                                  <Component id="pnlCategory" alignment="1" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace pref="12" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
               </Group>
@@ -2214,19 +2220,25 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="bt1Week" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
-                          <Component id="bt1Month" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
-                          <Component id="bt6Month" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btAll" alignment="0" min="-2" pref="31" max="-2" attributes="0"/>
-                          <Component id="bt1Year" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="bt1Week" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                              <Component id="bt1Month" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                              <Component id="bt6Month" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                              <Component id="bt1Year" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="pnlPie1" min="-2" pref="184" max="-2" attributes="0"/>
                           <Component id="pnlPie2" min="-2" pref="184" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="265" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jTextField1" min="-2" pref="1" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pnlCategory" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -2298,6 +2310,17 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="ALL"/>
               </Properties>
+            </Component>
+            <Container class="javax.swing.JPanel" name="pnlCategory">
+              <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                </Property>
+              </Properties>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+            </Container>
+            <Component class="javax.swing.JTextField" name="jTextField1">
             </Component>
           </SubComponents>
         </Container>

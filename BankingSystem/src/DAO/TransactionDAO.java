@@ -261,18 +261,21 @@ public class TransactionDAO {
         PreparedStatement statement = null;
         ResultSet rs = null;
         try{
-            String add1 = "AND ? in (senderID, receiverID)";
-            String add2 = "AND sendTime > ?";
+            String add1 = "AND ? in (senderID, receiverID) ";
+            String add2 = "AND (sendTime > ? OR receiveTime > ?)";
             String command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
                     + "WHERE true ";
             if(id != null) command += add1;
             if(begin != null) command += add2;
-            command += "GROUP BY type ORDER BY type";  
+            command += "GROUP BY type ORDER BY type ";  
             
             statement = c.prepareStatement(command);
             int cnt = 0;
             if(id != null) statement.setString(++cnt, id);
-            if(begin != null) statement.setTimestamp(++cnt, Timestamp.valueOf(begin)); 
+            if(begin != null){
+                statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
+                statement.setTimestamp(++cnt, Timestamp.valueOf(begin));
+            } 
             rs = statement.executeQuery();
             while(rs.next()){
                 result.add(rs.getLong("tong"));
@@ -290,4 +293,49 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result;
     }
+    
+    public List<Long> staticsFor5Month(String id, int year, int month){
+        Connection c = MyDatabase.getConnection();
+        List<Long> result = new ArrayList<>();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try{
+            String command = "SELECT senderID, receiverID, amount FROM transactions "
+                    + "WHERE status = 'SUCCESSFUL' AND ( (? = senderID AND YEAR(sendTime) = ? AND MONTH(sendTime) = ?) "
+                    + "OR (? = receiverID AND YEAR(receiveTime) = ? AND MONTH(receiveTime) = ?) )";
+
+            statement = c.prepareStatement(command);
+            statement.setString(1, id);
+            statement.setInt(2, year);
+            statement.setInt(3, month);
+            statement.setString(4, id);
+            statement.setInt(5, year);
+            statement.setInt(6, month);
+            Long income = Long.valueOf(0), expense = Long.valueOf(0);  
+            rs = statement.executeQuery();
+            while(rs.next()){
+                String senderID = rs.getString("senderID");
+                String receiverID = rs.getString("receiverID");
+                Long amount = rs.getLong("amount");
+                if(senderID == null){
+                    income += amount;
+                }
+                else{
+                    if(senderID.equals(id)) expense += amount;
+                    else income += amount;
+                }
+            }
+               result.add(income); result.add(expense);
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{ if(statement != null) statement.close();} catch(SQLException ex){}
+            try{ if(rs != null) rs.close();} catch(SQLException ex){}
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
+    
 }

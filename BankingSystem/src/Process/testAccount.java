@@ -68,8 +68,8 @@ public class testAccount {
 //        Transaction x = TransactionDAO.getInstance().filterTransaction("999007", LocalDateTime.now().minusMonths(1),
 //                LocalDateTime.now(), "ALL", "ALL").get(0);
 //        new FormTransaction(x.getSenderID(), x.getReceiverID(), x.getAmount(),  x.getDescription(), x.getSendTime());
-        new PieChartExample();
-        
+        // new PieChartExample();
+        TransactionDAO.getInstance().staticsFor5Month("999004", 11, 2025);
         
 
     }

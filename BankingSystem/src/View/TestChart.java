@@ -5,14 +5,27 @@
 package View;
 
 import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import javax.swing.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieToolTipGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PiePlot3D;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 /**
@@ -29,6 +42,7 @@ public class TestChart extends javax.swing.JFrame {
     public TestChart() {
         initComponents();
         showCircleChart();
+        showCategoryChart();
         this.setLocationRelativeTo(null);
     }
     
@@ -75,7 +89,59 @@ public class TestChart extends javax.swing.JFrame {
         pnlCircle.repaint();
     }
     
-    
+    private void showCategoryChart(){
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(12_000_000, "Income", "Tháng 6");
+        dataset.addValue(8_000_000, "Expense", "Tháng 6");
+        dataset.addValue(15_000_000, "Income", "Tháng 7");
+        dataset.addValue(10_000_000, "Withdraw", "Tháng 7");
+        dataset.addValue(14_000_000, "Income", "Tháng 8");
+        dataset.addValue(7_500_000, "Withdraw", "Tháng 8");
+        dataset.addValue(16_000_000, "Income", "Tháng 9");
+        dataset.addValue(9_000_000, "Withdraw", "Tháng 9");
+        dataset.addValue(13_000_000, "Deposit", "Tháng 10");
+        dataset.addValue(8_800_000, "Withdraw", "Tháng 10");
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Thống kê thu/chi 5 tháng gần nhất", // Tiêu đề
+                "Tháng",                            // Trục X
+                "Số tiền (VNĐ)",                    // Trục Y
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false
+        );
+        
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        NumberFormat vnFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setNumberFormatOverride(vnFormat);
+        // Giao diện ban đầu
+        plot.setBackgroundPaint(new Color(204,255,255));
+        plot.setRangeGridlinePaint(Color.GRAY);
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(0, 153, 255));  // Thu
+        renderer.setSeriesPaint(1, new Color(255, 102, 102)); // Chi
+
+       
+        plot.getDomainAxis().setCategoryMargin(0.3);
+        renderer.setItemMargin(0.0); 
+
+        renderer.setDefaultToolTipGenerator(
+            new StandardCategoryToolTipGenerator("({0}, {1}) = {2} ", NumberFormat.getInstance(new Locale("vi", "VN")))
+        );
+       
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(800, 500));
+        
+        chart.setTitle("Biểu đồ thu/chi của khách hàng");
+        plot.getDomainAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        plot.getRangeAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        renderer.setDefaultItemLabelsVisible(true);
+        
+        pnlCategory.add(chartPanel, BorderLayout.CENTER);
+    }
     
     
     @SuppressWarnings("unchecked")
@@ -84,26 +150,36 @@ public class TestChart extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         pnlCircle = new javax.swing.JPanel();
+        pnlCategory = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         pnlCircle.setLayout(new java.awt.BorderLayout());
+
+        pnlCategory.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(89, 89, 89)
-                .addComponent(pnlCircle, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(373, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addComponent(pnlCircle, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(204, 204, 204)
+                        .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(54, 54, 54)
+                .addContainerGap()
                 .addComponent(pnlCircle, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(272, Short.MAX_VALUE))
+                .addGap(26, 26, 26)
+                .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -147,6 +223,7 @@ public class TestChart extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel pnlCategory;
     private javax.swing.JPanel pnlCircle;
     // End of variables declaration//GEN-END:variables
 }
