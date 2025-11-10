@@ -29,8 +29,8 @@ public class AuthorizeDAO {
                     " values (?, ?, ?, ?)";
             statement = c.prepareStatement(command);
             
-            statement.setString(1, staffID);
-            statement.setString(2, accountID);
+            statement.setString(1, accountID);
+            statement.setString(2, staffID);
             statement.setString(3, decision);
             statement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
             result = statement.executeUpdate();
@@ -56,8 +56,8 @@ public class AuthorizeDAO {
                     " values (?, ?, ?, ?)";
             statement = c.prepareStatement(command);
             
-            statement.setString(1, staffID);
-            statement.setString(2, transID);
+            statement.setString(1, transID);
+            statement.setString(2, staffID);
             statement.setString(3, decision);
             statement.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
             result = statement.executeUpdate();

@@ -107,7 +107,7 @@ public class FormCustomer extends javax.swing.JFrame {
         btAll.doClick(); btHome.doClick(); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-         
+        this.setVisible(true);
     } 
     private void settingGUIComponent(){
         JComponent[] btArr = {btSaveInfo3, btChangePass3, btTransfer3, btWithdraw3, btDeposit3};
@@ -1478,7 +1478,7 @@ public class FormCustomer extends javax.swing.JFrame {
             .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                         .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2089,6 +2089,8 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogoutActionPerformed
         // TODO add your handling code here:
+        this.dispose();
+        new FormLogin();
     }//GEN-LAST:event_btLogoutActionPerformed
 
     /**
@@ -2113,9 +2115,9 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "nhan12@gmail.com";
+        String email = "nhuquynh@gmail.com";
         
-        java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new FormCustomer(email));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

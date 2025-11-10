@@ -7,6 +7,7 @@ package DAO;
 import Database.MyDatabase;
 import Model.Account;
 import Model.Customer;
+import Model.Manager;
 import Model.Staff;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -166,6 +167,10 @@ public class AccountDAO implements DAOInterface<Account>{
                 // System.out.println("sss");
                 String branch = rs.getString("branch");
                 ac = new Staff(id, fullName, email, password, gender, birthDay, active, branch);
+            }
+            else{
+                String branch = rs.getString("branch");
+                ac = new Manager(id, fullName, email, password, gender, birthDay, active, branch);
             }
         }
         catch(SQLException e){

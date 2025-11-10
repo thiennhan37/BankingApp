@@ -35,6 +35,7 @@ public class Transaction implements Comparable<Transaction>{
     }
 
     public Transaction(String senderID, String receiverID, Long amount, String type, String status, LocalDateTime sendTime, LocalDateTime receiveTime, String description) {
+        number = TransactionDAO.getInstance().countTransaction();
         this.transID = "TRANS" + String.format("%03d", (++number)); 
         this.senderID = senderID;
         this.receiverID = receiverID;
