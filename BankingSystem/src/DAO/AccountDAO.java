@@ -44,7 +44,8 @@ public class AccountDAO implements DAOInterface<Account>{
             statement.setDate(6, java.sql.Date.valueOf(ac.getBirthDay()));
             statement.setBoolean(7, ac.isActive());
             statement.setString(8, ac.getType());
-            statement.setLong(9, ac.getBalace());
+            if(ac.getBalace() != null) statement.setLong(9, ac.getBalace());
+            else statement.setNull(9, java.sql.Types.BIGINT);
             statement.setString(10, ac.getBranch());
             result = statement.executeUpdate();
         }

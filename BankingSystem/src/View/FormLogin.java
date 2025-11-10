@@ -39,14 +39,14 @@ public class FormLogin extends javax.swing.JFrame {
         }
         controller = new AccountControl(this);
         initComponents();
-        txtPassword1.setEchoChar((char) 0);
-        txtPassword2.setEchoChar((char) 0); 
+        // txtPassword1.setEchoChar((char) 0);
+        // txtPassword2.setEchoChar((char) 0); 
         cardLayout = (CardLayout) pnlCardBegin.getLayout();
         this.setLocationRelativeTo(null);
         setFormRegister();
         setRoundButton();
         btEyePass1.doClick(); btEyePass2.doClick();
-        
+        setVisible(true);
     }
     public void setRoundButton(){
         
@@ -67,6 +67,18 @@ public class FormLogin extends javax.swing.JFrame {
     public void setFormRegister(){
         FlatIntelliJLaf.setup();
 
+    }
+    private void resetPartLogin(){
+        JTextField[] arr = {txtEmail1, txtPassword1};
+        for(JTextField x : arr){
+            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }
+    private void resetPartRegister(){
+        JTextField[] arr = {txtEmail2, txtPassword2, txtFullName2, txtConfirmPass2};
+        for(JTextField x : arr){
+            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -152,7 +164,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(178, 137, 145));
         jLabel5.setText("Password");
 
-        btEyePass1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/seenEye.png"))); // NOI18N
+        btEyePass1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"))); // NOI18N
         btEyePass1.setContentAreaFilled(false);
         btEyePass1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -305,7 +317,7 @@ public class FormLogin extends javax.swing.JFrame {
             }
         });
 
-        btEyePass2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/seenEye.png"))); // NOI18N
+        btEyePass2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"))); // NOI18N
         btEyePass2.setContentAreaFilled(false);
         btEyePass2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -552,6 +564,7 @@ public class FormLogin extends javax.swing.JFrame {
 
     private void btCreateAccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCreateAccActionPerformed
         // TODO add your handling code here:
+        resetPartRegister();
         cardLayout.show(pnlCardBegin, "cardRegister");
     }//GEN-LAST:event_btCreateAccActionPerformed
 
@@ -629,6 +642,7 @@ public class FormLogin extends javax.swing.JFrame {
 
     private void btLogin2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogin2ActionPerformed
         // TODO add your handling code here:
+        resetPartLogin();
         cardLayout.show(pnlCardBegin, "cardLogin");
     }//GEN-LAST:event_btLogin2ActionPerformed
 
@@ -791,7 +805,7 @@ public class FormLogin extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FormLogin().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new FormLogin());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

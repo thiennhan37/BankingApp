@@ -9,6 +9,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -41,8 +43,9 @@ public class TestChart extends javax.swing.JFrame {
      */
     public TestChart() {
         initComponents();
-        showCircleChart();
-        showCategoryChart();
+//        showCircleChart();
+//        showCategoryChart();
+        setTxtChange();
         this.setLocationRelativeTo(null);
     }
     
@@ -143,7 +146,27 @@ public class TestChart extends javax.swing.JFrame {
         pnlCategory.add(chartPanel, BorderLayout.CENTER);
     }
     
-    
+    private void setTxtChange(){
+         txtChange.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                // System.out.println(txtChange.getText());
+                lblChange.setText("Nội dung: " + txtChange.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                lblChange.setText("Nội dung: " + txtChange.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Chỉ gọi với document có thuộc tính định dạng (như JTextPane)
+            }
+        });
+
+        
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -151,12 +174,22 @@ public class TestChart extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         pnlCircle = new javax.swing.JPanel();
         pnlCategory = new javax.swing.JPanel();
+        txtChange = new javax.swing.JTextField();
+        lblChange = new javax.swing.JLabel();
+        cbBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         pnlCircle.setLayout(new java.awt.BorderLayout());
 
         pnlCategory.setLayout(new java.awt.BorderLayout());
+
+        cbBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
+        cbBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -168,17 +201,33 @@ public class TestChart extends javax.swing.JFrame {
                         .addGap(41, 41, 41)
                         .addComponent(pnlCircle, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(204, 204, 204)
-                        .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                        .addGap(73, 73, 73)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cbBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 103, Short.MAX_VALUE))
+                            .addComponent(txtChange)
+                            .addComponent(lblChange, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(218, 218, 218)
+                        .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(24, 24, 24))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlCircle, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
-                .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(26, 26, 26)
+                        .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(64, 64, 64)
+                        .addComponent(txtChange, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(lblChange, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(64, 64, 64)
+                        .addComponent(cbBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
 
@@ -195,6 +244,11 @@ public class TestChart extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cbBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBoxActionPerformed
+        // TODO add your handling code here:
+        System.out.println(cbBox.getSelectedItem().toString());
+    }//GEN-LAST:event_cbBoxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -222,8 +276,11 @@ public class TestChart extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbBox;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblChange;
     private javax.swing.JPanel pnlCategory;
     private javax.swing.JPanel pnlCircle;
+    private javax.swing.JTextField txtChange;
     // End of variables declaration//GEN-END:variables
 }

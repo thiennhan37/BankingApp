@@ -4,12 +4,16 @@
  */
 package View;
 
+import DAO.AccountDAO;
+import DAO.TransactionDAO;
+import Model.Account;
 import Model.Transaction;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.mysql.cj.MysqlType;
 import jakarta.mail.search.DateTerm;
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +34,7 @@ public class FormTransaction extends javax.swing.JFrame {
      * Creates new form FormTransaction
      */
     private Transaction myTrans;
-    private String description, senderName, receiverName;
+    private String description, senderName = "", receiverName = "", title = "";
     private LocalDateTime time;
     private Long amount;
     private DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -48,6 +52,40 @@ public class FormTransaction extends javax.swing.JFrame {
         this.time = time;
         initComponents();
         getInfor();
+        // setGUIComponent();
+        this.setLocationRelativeTo(null);
+        this.setResizable(false); 
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setVisible(true);
+        
+    }
+    public FormTransaction(String transID, String decision) {
+        try {
+            FlatLightLaf.setup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Transaction x = TransactionDAO.getInstance().getTransaction(transID);
+        Account sender = null, receiver = null;
+        if(x.getSenderID() != null) sender = AccountDAO.getInstance().getObjectByID(x.getSenderID());
+        if(x.getReceiverID() != null) receiver = AccountDAO.getInstance().getObjectByID(x.getReceiverID());
+        this.description = x.getDescription();
+        if(sender != null) this.senderName = sender.getFullName();
+        if(receiver != null) this.receiverName = receiver.getFullName();
+        this.amount = x.getAmount();
+        this.time = x.getSendTime();
+        initComponents();
+        getInfor();
+        if(decision.equals("CONFIRM")){
+            pnlMain.setBackground(new Color(153,255,255));
+            title += "SUCCESSFUL ";
+        }
+        else{
+            pnlMain.setBackground(new Color(255,153,153));
+            title += "FAILED ";
+        }
+        title += x.getType();
+        lblTitle.setText(title);
         // setGUIComponent();
         this.setLocationRelativeTo(null);
         this.setResizable(false); 
@@ -80,7 +118,7 @@ public class FormTransaction extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        pnlMain = new javax.swing.JPanel();
         lblDescription = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         lblTime = new javax.swing.JLabel();
@@ -91,12 +129,12 @@ public class FormTransaction extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         lblReceiverName = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
         lblAmount = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(153, 255, 255));
+        pnlMain.setBackground(new java.awt.Color(153, 255, 255));
 
         lblDescription.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblDescription.setText("cccc ");
@@ -133,22 +171,22 @@ public class FormTransaction extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(178, 137, 145));
         jLabel7.setText("Description");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("SUCCESSFUL TRANSACTION");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("SUCCESSFUL TRANSFER");
 
         lblAmount.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblAmount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblAmount.setText("111.000 VND");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlMainLayout = new javax.swing.GroupLayout(pnlMain);
+        pnlMain.setLayout(pnlMainLayout);
+        pnlMainLayout.setHorizontalGroup(
+            pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+            .addGroup(pnlMainLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel4)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(lblSenderName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -162,10 +200,10 @@ public class FormTransaction extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addComponent(lblAmount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pnlMainLayout.setVerticalGroup(
+            pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMainLayout.createSequentialGroup()
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(lblAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15)
@@ -195,11 +233,11 @@ public class FormTransaction extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -215,13 +253,13 @@ public class FormTransaction extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAmount;
     private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblReceiverName;
     private javax.swing.JLabel lblSenderName;
     private javax.swing.JLabel lblTime;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JPanel pnlMain;
     // End of variables declaration//GEN-END:variables
 }

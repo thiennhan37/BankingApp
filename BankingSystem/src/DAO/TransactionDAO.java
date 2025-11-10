@@ -14,7 +14,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  *
@@ -40,6 +42,45 @@ public class TransactionDAO {
         MyDatabase.closeConnection(c);
         return result;
     }
+    public Transaction getTransaction(String transID){
+        Connection c = MyDatabase.getConnection();
+        PreparedStatement statement = null; ResultSet rs = null;
+        Transaction result = null;
+        try{
+            String command = "SELECT * FROM transactions WHERE transID = ?";
+            statement = c.prepareStatement(command);
+            statement.setString(1, transID); 
+            rs = statement.executeQuery();
+            if(rs.next()){
+                String senderID = rs.getString("senderID");
+                String receiverID = rs.getString("receiverID");
+                Long amount = rs.getLong("amount");
+                String type = rs.getString("type");
+                LocalDateTime sendTime = rs.getTimestamp("sendTime").toLocalDateTime();
+                LocalDateTime receiveTime = null;
+                if(rs.getTimestamp("receiveTime") != null) 
+                    receiveTime = rs.getTimestamp("receiveTime").toLocalDateTime();
+                String status = rs.getString("status");
+                String description = rs.getString("description");
+                result = new Transaction(senderID, receiverID, amount, type, status, sendTime, receiveTime, description, transID);
+            }
+            // System.out.println(result);
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            if(statement != null){
+                try{ statement.close();} catch(SQLException ex){}
+            }
+            if(rs != null){
+                try{ rs.close();} catch(SQLException ex){}
+            }
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
+    
     public boolean addTransaction(Transaction trans){
         Connection c = MyDatabase.getConnection();
         int result = 0;
@@ -255,27 +296,26 @@ public class TransactionDAO {
         return result;
     }
 
-    public List<Long> staticsPieForCustomer(String id, LocalDateTime begin){
+    public Long[] staticsPieForCustomer(String id, LocalDateTime begin){
         Connection c = MyDatabase.getConnection();
-        List<Long> result = new ArrayList<>();
+        Long[] result = new Long[]{0L, 0L, 0L, 0L, 0L, 0L};
         PreparedStatement statement = null;
         ResultSet rs = null;
         if(begin == null) begin = LocalDateTime.of(1990, 1, 1, 0, 0, 0);
-        System.out.println(begin);
         try{
             String command;
             if(id != null){
-                command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
+                command = "SELECT type, SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
                     + "WHERE status = 'SUCCESSFUL' AND "
                     + "( (type = 'TRANSFER' AND senderID = ? AND sendTime > ?) "
                     + "OR (type = 'WITHDRAW' AND senderID = ? AND sendTime > ?) "
                     + "OR (type = 'DEPOSIT' AND receiverID = ? AND receiveTime > ?) )"
-                    + "GROUP BY type ORDER BY type";
+                    + "GROUP BY type";
             }
             else{
-                command = "SELECT SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
+                command = "SELECT type, SUM(amount) AS tong, COUNT(*) AS sl FROM transactions "
                     + "WHERE status = 'SUCCESSFUL' AND ((sendTime > ?) OR (receiveTime > ?)) "
-                    + "GROUP BY type ORDER BY type ";
+                    + "GROUP BY type";
             }
 
             statement = c.prepareStatement(command);
@@ -294,8 +334,19 @@ public class TransactionDAO {
             } 
             rs = statement.executeQuery();
             while(rs.next()){
-                result.add(rs.getLong("tong"));
-                result.add(rs.getLong("sl"));
+                String type = rs.getString("type");
+                if(type.equals("TRANSFER")){
+                    result[0] += rs.getLong("tong");
+                    result[1] += rs.getLong("sl");
+                }
+                else if(type.equals("DEPOSIT")){
+                    result[2] += rs.getLong("tong");
+                    result[3] += rs.getLong("sl");
+                }
+                else{
+                    result[4] += rs.getLong("tong");
+                    result[5] += rs.getLong("sl");
+                }
             }
 
         }
@@ -341,7 +392,7 @@ public class TransactionDAO {
                     else income += amount;
                 }
             }
-               result.add(income); result.add(expense);
+            result.add(income); result.add(expense);
         }
         catch(SQLException e){
             e.printStackTrace();
@@ -354,4 +405,30 @@ public class TransactionDAO {
         return result;
     }
     
+    public LinkedHashMap<String, Long> staticsPremierCus(){
+        Connection c = MyDatabase.getConnection();
+        LinkedHashMap<String, Long> result = new LinkedHashMap<>();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try{
+            String command = "SELECT ID, balance FROM accounts WHERE type = 'Customer' ORDER BY balance DESC LIMIT 5;";
+
+            statement = c.prepareStatement(command);
+            rs = statement.executeQuery();
+            while(rs.next()){
+                String id = rs.getString("ID");
+                Long amount = rs.getLong("balance");
+                result.put(id, amount);
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            try{ if(statement != null) statement.close();} catch(SQLException ex){}
+            try{ if(rs != null) rs.close();} catch(SQLException ex){}
+        }
+        MyDatabase.closeConnection(c);
+        return result;
+    }
 }

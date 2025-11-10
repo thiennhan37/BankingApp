@@ -69,7 +69,8 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon closeEyeImage = new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"));
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
-    private ImageIcon FemalePerson = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
+    private ImageIcon FemaleIcon = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
+    private ImageIcon MaleIcon = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
     private DefaultTableModel historyTableModel;
     private DefaultPieDataset datasetPie1, datasetPie2;
     private DefaultCategoryDataset datasetCategory;
@@ -91,7 +92,7 @@ public class FormCustomer extends javax.swing.JFrame {
         
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
-        if(myAccount.getGender().equals("Female")) lblProfile.setIcon(FemalePerson);
+        
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
         historyTableModel = (DefaultTableModel) tblHistory.getModel();
@@ -225,7 +226,8 @@ public class FormCustomer extends javax.swing.JFrame {
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
-        
+        if(myAccount.getGender().equals("Female")) lblProfile.setIcon(FemaleIcon);
+        else lblProfile.setIcon(MaleIcon);
         
         lblBalance3.setText(numberFormat.format(myAccount.getBalace()));
     }
@@ -379,7 +381,7 @@ public class FormCustomer extends javax.swing.JFrame {
         JButton[] btArr = {bt1Week, bt1Month, bt6Month, bt1Year, btAll};
         
         for(JButton x : btArr){
-            x.addActionListener(new ActionListener(){
+            x.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     switch(x.getActionCommand()){
@@ -399,16 +401,16 @@ public class FormCustomer extends javax.swing.JFrame {
                             beginCusSta= null;
                         }
                     }
-                    List<Long> result = TransactionDAO.getInstance().staticsPieForCustomer(myAccount.getId(), beginCusSta);
+                    Long[] result = TransactionDAO.getInstance().staticsPieForCustomer(myAccount.getId(), beginCusSta);
                     if(datasetPie1 != null) datasetPie1.clear(); 
                     if(datasetPie2 != null) datasetPie2.clear();
-                    datasetPie1.setValue("Transfer", result.get(2));
-                    datasetPie1.setValue("Withdraw", result.get(4));
-                    datasetPie1.setValue("Deposit", result.get(0));
+                    datasetPie1.setValue("Transfer", result[0]);
+                    datasetPie1.setValue("Withdraw", result[2]);
+                    datasetPie1.setValue("Deposit", result[4]);
                     
-                    datasetPie2.setValue("Transfer", result.get(3));
-                    datasetPie2.setValue("Withdraw", result.get(5));
-                    datasetPie2.setValue("Deposit", result.get(1));
+                    datasetPie2.setValue("Transfer", result[1]);
+                    datasetPie2.setValue("Withdraw", result[3]);
+                    datasetPie2.setValue("Deposit", result[5]);
                     // System.out.println(x.getActionCommand());
                     
                 }
@@ -708,7 +710,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         btTransfer.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btTransfer.setForeground(new java.awt.Color(51, 51, 51));
-        btTransfer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/transfer.png"))); // NOI18N
+        btTransfer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/icons8-data-transfer-48.png"))); // NOI18N
         btTransfer.setText(" Transfer ");
         btTransfer.setBorderPainted(false);
         btTransfer.addActionListener(new java.awt.event.ActionListener() {
@@ -720,7 +722,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         btMoney.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btMoney.setForeground(new java.awt.Color(51, 51, 51));
-        btMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/money.png"))); // NOI18N
+        btMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/money2.png"))); // NOI18N
         btMoney.setText("  Money");
         btMoney.setBorderPainted(false);
         btMoney.addActionListener(new java.awt.event.ActionListener() {
@@ -732,7 +734,7 @@ public class FormCustomer extends javax.swing.JFrame {
 
         btHistory.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btHistory.setForeground(new java.awt.Color(51, 51, 51));
-        btHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/bill.png"))); // NOI18N
+        btHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/bill2.png"))); // NOI18N
         btHistory.setText("   History   ");
         btHistory.setBorderPainted(false);
         btHistory.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -781,6 +783,11 @@ public class FormCustomer extends javax.swing.JFrame {
                 btLogoutMouseExited(evt);
             }
         });
+        btLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btLogoutActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlLogoutLayout = new javax.swing.GroupLayout(pnlLogout);
         pnlLogout.setLayout(pnlLogoutLayout);
@@ -791,7 +798,7 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlLogoutLayout.setVerticalGroup(
             pnlLogoutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlLogoutLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(34, 34, 34)
                 .addComponent(btLogout)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1564,6 +1571,8 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlCategory.setBackground(new java.awt.Color(255, 255, 255));
         pnlCategory.setLayout(new java.awt.BorderLayout());
 
+        jTextField1.setBackground(new java.awt.Color(0, 0, 0));
+
         javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
         pnlCardStatics.setLayout(pnlCardStaticsLayout);
         pnlCardStaticsLayout.setHorizontalGroup(
@@ -1609,7 +1618,7 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlCategory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1667,8 +1676,8 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addComponent(lblLineRow1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(1, 1, 1)
+                        .addComponent(pnlMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
                         .addComponent(lblLineRow2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1887,6 +1896,10 @@ public class FormCustomer extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Account is not valid!", "", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if(!toAccount.isActive()){
+            JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         if(txtTransAmount.getValue() == null || Long.valueOf(txtTransAmount.getValue().toString()) < 1000){
             JOptionPane.showMessageDialog(this, "Amount is not valid!", 
                     "", JOptionPane.WARNING_MESSAGE);
@@ -2074,6 +2087,10 @@ public class FormCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_bt1MonthActionPerformed
 
+    private void btLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogoutActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btLogoutActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2096,7 +2113,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "nhanprovip37@gmail.com";
+        String email = "nhan12@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email).setVisible(true));
     }

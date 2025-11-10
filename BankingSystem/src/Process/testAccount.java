@@ -19,7 +19,9 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import View.OTPDialog;
+import java.awt.event.*;
 import java.time.*;
+import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -56,7 +58,49 @@ public class testAccount {
     /**
      * @param args the command line arguments
      */
-    
+    public static void  createAndShowGUI() {
+        JFrame frame = new JFrame("Ví dụ JTable đơn giản");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 300);
+
+        // ===== DỮ LIỆU MẪU =====
+        String[] columnNames = {"ID", "Tên", "Tuổi"};
+        Object[][] data = {
+            {1, "Nguyễn Văn A", 20},
+            {2, "Trần Thị B", 22},
+            {3, "Lê Văn C", 19},
+            {4, "Phạm Thị D", 21}
+        };
+
+        // ===== TẠO MODEL & TABLE =====
+        DefaultTableModel model = new DefaultTableModel(data, columnNames);
+        JTable table = new JTable(model);
+        table.setDefaultEditor(Object.class, null);
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane, BorderLayout.CENTER);
+        
+        // ===== SỰ KIỆN NHẤN ĐÚP =====
+        table.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+                    int row = table.rowAtPoint(e.getPoint());
+                    if (row != -1) {
+                        Object id = table.getValueAt(row, 0);
+                        Object name = table.getValueAt(row, 1);
+                        Object age = table.getValueAt(row, 2);
+                        JOptionPane.showMessageDialog(frame,
+                                "Bạn nhấn đúp vào:\nID: " + id + "\nTên: " + name + "\nTuổi: " + age);
+                    }
+                }
+            }
+        });
+
+        frame.setLocationRelativeTo(null); // giữa màn hình
+        frame.setVisible(true);
+    }
     public static void main(String args[]) {
         try {
             FlatLightLaf.setup();
@@ -69,8 +113,14 @@ public class testAccount {
 //                LocalDateTime.now(), "ALL", "ALL").get(0);
 //        new FormTransaction(x.getSenderID(), x.getReceiverID(), x.getAmount(),  x.getDescription(), x.getSendTime());
         // new PieChartExample();
-        TransactionDAO.getInstance().staticsFor5Month("999004", 11, 2025);
-        
+        // createAndShowGUI();
+        Scanner sc = new Scanner(System.in);
+//        String s = sc.next();
+//        String[] arr = s.split("/");
+//        for(String x : arr){
+//            System.out.println(x);
+//        }
+//        System.out.println(s);
 
     }
 }

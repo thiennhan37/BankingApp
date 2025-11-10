@@ -5,11 +5,15 @@
 package View;
 
 import Control.AccountControl;
+import Control.AuthorizeControl;
 import Control.StaffControl;
 import Control.TransactionControl;
 import DAO.TransactionDAO;
 import Model.Account;
+import Model.AccountManage;
+import Model.Staff;
 import Model.Transaction;
+import Model.TransactionManage;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -34,6 +38,20 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.labels.StandardPieToolTipGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 /**
  *
  * @author Hi
@@ -48,6 +66,7 @@ public class FormStaff extends javax.swing.JFrame {
     private TransactionControl transController;
     private AccountControl accController;
     private StaffControl stfController;
+    private AuthorizeControl authController;
     private Account myAccount;
     private String myEmail;
     private CardLayout cardLayout3;
@@ -57,14 +76,17 @@ public class FormStaff extends javax.swing.JFrame {
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private ImageIcon FemaleAdmin = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemaleAdmin.png"));
-    private DefaultTableModel authorizeTableModel, searchCusTBMD, searchTransTBMD;
+    private DefaultTableModel authorizeTableModel, searchCusTBMD, searchTransTBMD, manageAccTBMD, manageTransTBMD;
     private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));;
     private DateTimeFormatter fm2Y = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
     private DateTimeFormatter fm4Y = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private DateTimeFormatter fmForBirth = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private Locale myLocale = new Locale("vi", "VN");
     private Color color1 = new Color(255,255,255), 
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
+    private DefaultPieDataset datasetPie1, datasetPie2;
+    private DefaultCategoryDataset datasetCategory;
     public FormStaff(String myEmail) {
         try {
             FlatLightLaf.setup();
@@ -75,6 +97,7 @@ public class FormStaff extends javax.swing.JFrame {
         accController = new AccountControl(this);
         transController = new TransactionControl();
         stfController = new StaffControl();
+        authController = new AuthorizeControl();
         initComponents();
         resetAccount();
         if(myAccount.getGender().equals("Female")) lblProfile.setIcon(FemaleAdmin);
@@ -83,9 +106,13 @@ public class FormStaff extends javax.swing.JFrame {
         authorizeTableModel = (DefaultTableModel) tblAuthorize.getModel();
         searchCusTBMD = (DefaultTableModel) tblCustomerS.getModel();
         searchTransTBMD = (DefaultTableModel) tblTransactionS.getModel();
+        manageTransTBMD = (DefaultTableModel) tblManageTrans.getModel();
+        manageAccTBMD = (DefaultTableModel) tblManageAcc.getModel();
         settingGUIComponent();
         setMouseList(); 
         setRestrict();
+        setManageFunction(); setTransManage(); setAccountManage();
+        addForStat(); btAllTime.doClick();
         this.setResizable(false);
         this.setLocationRelativeTo(null);
     } 
@@ -94,23 +121,31 @@ public class FormStaff extends javax.swing.JFrame {
         for(JComponent x : btArr){
            x.putClientProperty(FlatClientProperties.STYLE,"arc:25;");
         }
+        JComponent[] btTime = {bt1Week, bt1Month, bt6Month, bt1Year, btAllTime};
+        for(JComponent x : btTime){
+           x.putClientProperty(FlatClientProperties.STYLE,"arc:20;borderColor:#B28991;");
+        }
         
         lblEmail3.putClientProperty("FlatLaf.style", "arc:20; background:#F0F8FF;");
         
         JComponent[] fieldTime = {fieldDay3, fieldMonth3, fieldYear3, fieldBeginMonthA, fieldBeginYearA,
-                    fieldEndMonthA, fieldEndYearA, fieldTypeA, txtSenderID, txtReceiverID,fieldTypeS, fieldStatusS,
-                     fieldBeginMonthS, fieldBeginYearS, fieldEndMonthS, fieldEndYearS,txtCustomerID};
+                    fieldEndMonthA, fieldEndYearA, fieldTypeA, fieldTypeS, fieldStatusS,
+                     fieldBeginMonthS, fieldBeginYearS, fieldEndMonthS, fieldEndYearS, 
+                    fieldMonthManage1, fieldMonthManage2, fieldYearManage1, fieldYearManage2};
         for(JComponent x : fieldTime){
            x.putClientProperty("FlatLaf.style", "borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
         
         
-        JComponent[] txtArr = {txtFullName3, txtPassword3, txtConfirmPass3};
+        JComponent[] txtArr = {txtFullName3, txtPassword3, txtConfirmPass3, 
+            txtBranch2, txtEmail2, txtPassword2, txtConfirmPass2, txtFullName2, 
+            txtTransManage, txtAccManage, txtStaffManage1, txtStaffManage2, 
+            txtSenderID, txtReceiverID,txtCusSearch};
         for(JComponent x : txtArr){
            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
 
-        JTable[] tblArr = {tblAuthorize, tblCustomerS, tblTransactionS};
+        JTable[] tblArr = {tblAuthorize, tblCustomerS, tblTransactionS, tblManageAcc, tblManageTrans};
         for(JTable x : tblArr){
             JTableHeader header = x.getTableHeader();
             header.putClientProperty("FlatLaf.style", ""
@@ -141,16 +176,36 @@ public class FormStaff extends javax.swing.JFrame {
         transCLMD.getColumn(3).setPreferredWidth(90);
         transCLMD.getColumn(6).setPreferredWidth(90);
         
+        datasetPie1 = new DefaultPieDataset();
+        datasetPie2 = new DefaultPieDataset();
+        setPieChart(datasetPie1, pnlPie1, "Transaction Amount By Type");
+        setPieChart(datasetPie2, pnlPie2, "Transaction Quantity By Type");
+        
+        datasetCategory = new DefaultCategoryDataset();
+        setCategoryChart();
+        
+        TableColumnModel transManageCLMD = tblManageTrans.getColumnModel();
+        transManageCLMD.getColumn(0).setPreferredWidth(30);
+        transManageCLMD.getColumn(1).setPreferredWidth(30);
+        transManageCLMD.getColumn(2).setPreferredWidth(40);
+        transManageCLMD.getColumn(3).setPreferredWidth(60);
+        
+        TableColumnModel accManageCLMD = tblManageAcc.getColumnModel();
+        accManageCLMD.getColumn(0).setPreferredWidth(30);
+        accManageCLMD.getColumn(1).setPreferredWidth(30);
+        accManageCLMD.getColumn(2).setPreferredWidth(40);
+        accManageCLMD.getColumn(3).setPreferredWidth(60);
+        
     }   
     private void setRestrict(){
-        JFormattedTextField[] arr = {txtSenderID, txtReceiverID, txtCustomerID};
+        JFormattedTextField[] arr = {txtSenderID, txtReceiverID, txtCusSearch};
         for(JFormattedTextField x : arr){
             setTextForNumber(x);
         }
     } 
             
     private void setMouseList(){
-        JButton[] arr = {btHome, btAuthorize, btSearch, btMoney, btProfile, btStatics, btLogout};
+        JButton[] arr = {btStaff, btAuthorize, btSearch, btManage, btProfile, btStatics, btLogout};
         
         for(int i = 0; i < arr.length; i++){
             JButton x = arr[i];
@@ -224,6 +279,8 @@ public class FormStaff extends javax.swing.JFrame {
         fieldEndMonthA.setSelectedIndex(now.getMonthValue() - 1); fieldEndYearA.setSelectedIndex(now.getYear() - 1900);
         fieldBeginMonthS.setSelectedIndex(0); fieldBeginYearS.setSelectedIndex(2005 - 1900);
         fieldEndMonthS.setSelectedIndex(now.getMonthValue() - 1); fieldEndYearS.setSelectedIndex(now.getYear() - 1900);
+        fieldMonthManage1.setSelectedIndex(now.getMonthValue() - 1); fieldYearManage1.setSelectedIndex(now.getYear() - 2010);
+        fieldMonthManage2.setSelectedIndex(now.getMonthValue() - 1); fieldYearManage2.setSelectedIndex(now.getYear() - 2010);
     }
     private void setTextForNumber(JFormattedTextField txtFormat){
         NumberFormat numFormat = NumberFormat.getNumberInstance();
@@ -324,10 +381,224 @@ public class FormStaff extends javax.swing.JFrame {
         }
     }
     
+    private void setPieChart(DefaultPieDataset dataset, JPanel pnlPie, String title){
+        dataset.setValue("Transfer", 1);
+        dataset.setValue("Withdraw", 1);
+        dataset.setValue("Deposit", 1);
+        
+        JFreeChart chart = ChartFactory.createPieChart(title, dataset, true, true, true);
+        if (chart.getLegend() != null) {
+            chart.getLegend().setItemFont(new Font("Times New Roman", Font.BOLD, 14));
+        }
+        chart.getTitle().setFont(new Font("Times New Roman", Font.BOLD, 18)); 
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setSectionPaint("Transfer", new Color(255, 255, 102));
+        plot.setSectionPaint("Withdraw", new Color(102, 255, 102));
+        plot.setSectionPaint("Deposit", new Color(255, 102, 153));
+
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+            "{2}"    // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
+        ));
+        plot.setToolTipGenerator(new StandardPieToolTipGenerator(
+            "{0} = {1}", myLocale    // {0}=tên, {1}=giá trị, {2}=tỉ lệ %
+        ));
+        plot.setSimpleLabels(true);
+
+        plot.setLabelFont(new Font("Calibri", Font.BOLD, 14));
+        plot.setLabelBackgroundPaint(Color.WHITE);
+        plot.setBackgroundPaint(new Color(204, 255, 255));
+        plot.setInteriorGap(0.01);
+        
+        plot.setLabelBackgroundPaint(null);      // bỏ màu nền
+        plot.setLabelOutlinePaint(null);         // bỏ viền chữ nhật
+        plot.setLabelShadowPaint(null);
+        
+        ChartPanel chartPnl = new ChartPanel(chart);
+        chartPnl.setDisplayToolTips(true);
+        chartPnl.setMouseWheelEnabled(true); 
+        
+        
+        pnlPie.removeAll(); 
+        pnlPie.add(chartPnl, BorderLayout.CENTER);
+        pnlPie.validate();
+    }
+    private LocalDateTime beginCusSta= null;
+    private void addForStat(){
+        JButton[] btArr = {bt1Week, bt1Month, bt6Month, bt1Year, btAllTime};
+        
+        for(JButton x : btArr){
+            x.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    switch(x.getActionCommand()){
+                        case("1 Week") ->{
+                            beginCusSta = LocalDateTime.now().minusDays(7);
+                        }
+                        case("1 Month") ->{
+                            beginCusSta = LocalDateTime.now().minusMonths(1);
+                        }
+                        case("6 Month") ->{
+                            beginCusSta = LocalDateTime.now().minusMonths(6);
+                        }
+                        case("1 Year") ->{
+                            beginCusSta = LocalDateTime.now().minusYears(1);
+                        } 
+                        default ->{
+                            beginCusSta= null;
+                        }
+                    }
+                    Long[] result = TransactionDAO.getInstance().staticsPieForCustomer(null, beginCusSta);
+                    if(datasetPie1 != null) datasetPie1.clear(); 
+                    if(datasetPie2 != null) datasetPie2.clear();
+                    datasetPie1.setValue("Transfer", result[0]);
+                    datasetPie1.setValue("Withdraw", result[2]);
+                    datasetPie1.setValue("Deposit", result[4]);
+                    
+                    datasetPie2.setValue("Transfer", result[1]);
+                    datasetPie2.setValue("Withdraw", result[3]);
+                    datasetPie2.setValue("Deposit", result[5]);
+                    
+                }
+            });
+            
+            x.addFocusListener(new FocusListener(){
+                @Override
+                public void focusGained(FocusEvent e) {
+                    x.setBackground(color3);
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    x.setBackground(color1);
+                }
+                
+            });
+        }
+                   
+    }
     
+    private void setCategoryChart(){ 
+
+        LinkedHashMap<String, Long> lst = TransactionDAO.getInstance().staticsPremierCus();
+        // System.out.println(x.getMonthValue() + " " + x.getYear());
+        int cnt = 0;
+        for(String id : lst.keySet()){
+            datasetCategory.addValue(lst.get(id), "Balance", id); 
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Premier Customers by Account Holdings", // Tiêu đề
+                "Customer ID",                            // Trục X
+                "Total Balance(VND)",                    // Trục Y
+                datasetCategory,
+                PlotOrientation.HORIZONTAL,
+                true, true, false
+        );
+        
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        NumberFormat vnFormat = NumberFormat.getInstance(myLocale);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setNumberFormatOverride(vnFormat);
+        // Giao diện ban đầu
+        plot.setBackgroundPaint(new Color(204,255,255));
+        plot.setRangeGridlinePaint(Color.GRAY);
+        
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(0, 153, 255));
+        plot.getDomainAxis().setCategoryMargin(0.4);
+        
+        renderer.setDefaultToolTipGenerator(
+            new StandardCategoryToolTipGenerator("{2}", NumberFormat.getInstance(myLocale))
+        );
+        
+        chart.getTitle().setFont(new Font("Times New Roman", Font.BOLD, 18)); 
+        chart.getLegend().setItemFont(new Font("Times New Roman", Font.BOLD, 14)); 
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(350, 500));
+        
+        plot.getDomainAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        plot.getRangeAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        renderer.setDefaultItemLabelsVisible(true);
+        
+        pnlCategory.add(chartPanel, BorderLayout.CENTER);
+        
+    }
     
-    
-    
+    private void setTransManage(){
+        int month = Integer.parseInt(fieldMonthManage1.getSelectedItem().toString());
+        int year = Integer.parseInt(fieldYearManage1.getSelectedItem().toString());
+        String transID = txtTransManage.getText();
+        String staffID = txtStaffManage1.getText();
+        List<TransactionManage> lst = authController.filterTransManage(transID, staffID, year, month);
+        manageTransTBMD.setRowCount(0); 
+        for(TransactionManage x : lst){
+            manageTransTBMD.addRow(new Object[]{x.getTransactionID(), x.getStaffID(), x.getDecision(), x.getTime().format(fm4Y)}); 
+        }
+    }
+    private void setAccountManage(){
+        int month = Integer.parseInt(fieldMonthManage2.getSelectedItem().toString());
+        int year = Integer.parseInt(fieldYearManage2.getSelectedItem().toString());
+        String accountID = txtAccManage.getText();
+        String staffID = txtStaffManage2.getText();
+        List<AccountManage> lst = authController.filterAccManage(accountID, staffID, year, month);
+        manageAccTBMD.setRowCount(0); 
+        for(AccountManage x : lst){
+            manageAccTBMD.addRow(new Object[]{x.getAccountID(), x.getStaffID(), x.getDecision(), x.getTime().format(fm4Y)}); 
+        }
+    }
+    private void setManageFunction(){
+        JTextField[] arrText1 = {txtStaffManage1, txtTransManage};
+        for(JTextField x : arrText1){
+            x.getDocument().addDocumentListener(new DocumentListener(){
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    setTransManage();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    setTransManage();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    
+                }
+            });
+        }
+        JComboBox[] arrComboBox1 = {fieldMonthManage1, fieldYearManage1};
+        for(JComboBox x : arrComboBox1){
+            x.addActionListener((ActionEvent e) -> {
+                setTransManage();
+            });
+        }
+        JTextField[] arrText2 = {txtStaffManage2, txtAccManage};
+        for(JTextField x : arrText2){
+            x.getDocument().addDocumentListener(new DocumentListener(){
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    setAccountManage();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    setAccountManage();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    
+                }
+            });
+        }
+        JComboBox[] arrComboBox2 = {fieldMonthManage2, fieldYearManage2};
+        for(JComboBox x : arrComboBox2){
+            x.addActionListener((ActionEvent e) -> {
+                setAccountManage();
+            });
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -340,6 +611,7 @@ public class FormStaff extends javax.swing.JFrame {
         GenderGroup3 = new javax.swing.ButtonGroup();
         jLabel19 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        GenderGroupRegister = new javax.swing.ButtonGroup();
         pnlTop = new javax.swing.JPanel();
         btReset3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -348,12 +620,12 @@ public class FormStaff extends javax.swing.JFrame {
         lblBranch = new javax.swing.JLabel();
         lblFullName3 = new javax.swing.JLabel();
         pnlMenu = new javax.swing.JPanel();
-        btHome = new javax.swing.JButton();
         btProfile = new javax.swing.JButton();
         btSearch = new javax.swing.JButton();
-        btMoney = new javax.swing.JButton();
         btAuthorize = new javax.swing.JButton();
         btStatics = new javax.swing.JButton();
+        btStaff = new javax.swing.JButton();
+        btManage = new javax.swing.JButton();
         lblProfile = new javax.swing.JLabel();
         lblLineRow1 = new javax.swing.JLabel();
         pnlLogout = new javax.swing.JPanel();
@@ -362,9 +634,42 @@ public class FormStaff extends javax.swing.JFrame {
         lblLineCol1 = new javax.swing.JLabel();
         lblLineRow2 = new javax.swing.JLabel();
         pnlCard = new javax.swing.JPanel();
-        pnlCardHome = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        pnlCardStaff1 = new javax.swing.JPanel();
+        btAddStaffAcc = new javax.swing.JButton();
+        btFindStaff = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
+        jLabel34 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        pnlCardStaff2 = new javax.swing.JPanel();
+        pnlRegister = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        txtFullName2 = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        txtEmail2 = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        txtPassword2 = new javax.swing.JPasswordField();
+        jLabel22 = new javax.swing.JLabel();
+        txtConfirmPass2 = new javax.swing.JPasswordField();
+        btEyePass2 = new javax.swing.JButton();
+        btRegister2 = new javax.swing.JButton();
+        fieldDay2 = new javax.swing.JComboBox<>();
+        jLabel26 = new javax.swing.JLabel();
+        fieldMonth2 = new javax.swing.JComboBox<>();
+        jLabel31 = new javax.swing.JLabel();
+        jLabel32 = new javax.swing.JLabel();
+        fieldYear2 = new javax.swing.JComboBox<>();
+        btMale2 = new javax.swing.JRadioButton();
+        btFemale2 = new javax.swing.JRadioButton();
+        jLabel33 = new javax.swing.JLabel();
+        lblWarn2 = new javax.swing.JLabel();
+        btExit2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        txtBranch2 = new javax.swing.JTextField();
         pnlCardProfile = new javax.swing.JPanel();
         pnlSubProfile1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -389,7 +694,27 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         btChangePass3 = new javax.swing.JButton();
         lblWarnSavePass3 = new javax.swing.JLabel();
-        pnlCardMoney = new javax.swing.JPanel();
+        pnlCardManage = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tblManageTrans = new javax.swing.JTable();
+        jLabel35 = new javax.swing.JLabel();
+        txtTransManage = new javax.swing.JTextField();
+        jLabel36 = new javax.swing.JLabel();
+        txtStaffManage1 = new javax.swing.JTextField();
+        fieldMonthManage1 = new javax.swing.JComboBox<>();
+        jLabel37 = new javax.swing.JLabel();
+        fieldYearManage1 = new javax.swing.JComboBox<>();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        tblManageAcc = new javax.swing.JTable();
+        jLabel38 = new javax.swing.JLabel();
+        jLabel39 = new javax.swing.JLabel();
+        txtStaffManage2 = new javax.swing.JTextField();
+        jLabel40 = new javax.swing.JLabel();
+        fieldMonthManage2 = new javax.swing.JComboBox<>();
+        fieldYearManage2 = new javax.swing.JComboBox<>();
+        txtAccManage = new javax.swing.JTextField();
         pnlCardSearch = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTransactionS = new javax.swing.JTable();
@@ -406,7 +731,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel30 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tblCustomerS = new javax.swing.JTable();
-        txtCustomerID = new javax.swing.JFormattedTextField();
+        txtCusSearch = new javax.swing.JFormattedTextField();
         jLabel16 = new javax.swing.JLabel();
         btActivate = new javax.swing.JButton();
         btDeactivate = new javax.swing.JButton();
@@ -430,8 +755,15 @@ public class FormStaff extends javax.swing.JFrame {
         btConfirm = new javax.swing.JButton();
         btReject = new javax.swing.JButton();
         pnlCardStatics = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        bt1Week = new javax.swing.JButton();
+        pnlPie1 = new javax.swing.JPanel();
+        pnlPie2 = new javax.swing.JPanel();
+        bt1Month = new javax.swing.JButton();
+        bt6Month = new javax.swing.JButton();
+        bt1Year = new javax.swing.JButton();
+        btAllTime = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        pnlCategory = new javax.swing.JPanel();
         lblMemberID = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
 
@@ -493,7 +825,7 @@ public class FormStaff extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblBranch, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(41, 41, 41)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btReset3)
                 .addGap(16, 16, 16))
         );
@@ -521,17 +853,6 @@ public class FormStaff extends javax.swing.JFrame {
         pnlMenu.setBackground(new java.awt.Color(255, 255, 255));
         pnlMenu.setLayout(new java.awt.GridLayout(0, 1));
 
-        btHome.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btHome.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/home.png"))); // NOI18N
-        btHome.setText("  Home   ");
-        btHome.setBorderPainted(false);
-        btHome.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btHomeActionPerformed(evt);
-            }
-        });
-        pnlMenu.add(btHome);
-
         btProfile.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btProfile.setForeground(new java.awt.Color(51, 51, 51));
         btProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/information.png"))); // NOI18N
@@ -556,18 +877,6 @@ public class FormStaff extends javax.swing.JFrame {
         });
         pnlMenu.add(btSearch);
 
-        btMoney.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btMoney.setForeground(new java.awt.Color(51, 51, 51));
-        btMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/money.png"))); // NOI18N
-        btMoney.setText("  Money");
-        btMoney.setBorderPainted(false);
-        btMoney.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btMoneyActionPerformed(evt);
-            }
-        });
-        pnlMenu.add(btMoney);
-
         btAuthorize.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btAuthorize.setForeground(new java.awt.Color(51, 51, 51));
         btAuthorize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/authorize.png"))); // NOI18N
@@ -588,7 +897,7 @@ public class FormStaff extends javax.swing.JFrame {
         btStatics.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btStatics.setForeground(new java.awt.Color(51, 51, 51));
         btStatics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/chart.png"))); // NOI18N
-        btStatics.setText("  Statics  ");
+        btStatics.setText("   Statics  ");
         btStatics.setBorderPainted(false);
         btStatics.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -596,6 +905,29 @@ public class FormStaff extends javax.swing.JFrame {
             }
         });
         pnlMenu.add(btStatics);
+
+        btStaff.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btStaff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/staff.png"))); // NOI18N
+        btStaff.setText("   Staff");
+        btStaff.setBorderPainted(false);
+        btStaff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btStaffActionPerformed(evt);
+            }
+        });
+        pnlMenu.add(btStaff);
+
+        btManage.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btManage.setForeground(new java.awt.Color(51, 51, 51));
+        btManage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/icons8-manage-50.png"))); // NOI18N
+        btManage.setText(" Manage");
+        btManage.setBorderPainted(false);
+        btManage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btManageActionPerformed(evt);
+            }
+        });
+        pnlMenu.add(btManage);
 
         lblProfile.setBackground(new java.awt.Color(153, 255, 255));
         lblProfile.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -619,21 +951,24 @@ public class FormStaff extends javax.swing.JFrame {
                 btLogoutMouseExited(evt);
             }
         });
+        btLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btLogoutActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlLogoutLayout = new javax.swing.GroupLayout(pnlLogout);
         pnlLogout.setLayout(pnlLogoutLayout);
         pnlLogoutLayout.setHorizontalGroup(
             pnlLogoutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLogoutLayout.createSequentialGroup()
-                .addComponent(btLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(btLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlLogoutLayout.setVerticalGroup(
             pnlLogoutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLogoutLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btLogout)
-                .addGap(43, 43, 43))
+                .addGap(36, 36, 36))
         );
 
         lblLineCol2.setBackground(new java.awt.Color(0, 0, 0));
@@ -647,36 +982,362 @@ public class FormStaff extends javax.swing.JFrame {
 
         pnlCard.setLayout(new java.awt.CardLayout());
 
-        pnlCardHome.setAlignmentX(0.0F);
+        pnlCardStaff1.setAlignmentX(0.0F);
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Giám đốc nhân sự 093 456 789 xinchao@trangwebhay.vn.gif"))); // NOI18N
+        btAddStaffAcc.setBackground(new java.awt.Color(153, 255, 204));
+        btAddStaffAcc.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btAddStaffAcc.setText("Add Staff Account");
+        btAddStaffAcc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAddStaffAccActionPerformed(evt);
+            }
+        });
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/ChucTet.png"))); // NOI18N
+        btFindStaff.setBackground(new java.awt.Color(153, 255, 255));
+        btFindStaff.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btFindStaff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/find.png"))); // NOI18N
+        btFindStaff.setText("Find");
 
-        javax.swing.GroupLayout pnlCardHomeLayout = new javax.swing.GroupLayout(pnlCardHome);
-        pnlCardHome.setLayout(pnlCardHomeLayout);
-        pnlCardHomeLayout.setHorizontalGroup(
-            pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addGroup(pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardHomeLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel4.setText("Staff ID");
+
+        jButton1.setBackground(new java.awt.Color(51, 255, 51));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton1.setText("Activate");
+
+        jButton2.setBackground(new java.awt.Color(255, 51, 51));
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton2.setText("Deactivate");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTable1);
+
+        javax.swing.GroupLayout pnlCardStaff1Layout = new javax.swing.GroupLayout(pnlCardStaff1);
+        pnlCardStaff1.setLayout(pnlCardStaff1Layout);
+        pnlCardStaff1Layout.setHorizontalGroup(
+            pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                        .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                                .addGap(35, 35, 35)
+                                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btFindStaff, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(35, 35, 35)
+                        .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(96, 96, 96)
+                        .addComponent(btAddStaffAcc))
+                    .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
-        pnlCardHomeLayout.setVerticalGroup(
-            pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardHomeLayout.createSequentialGroup()
+        pnlCardStaff1Layout.setVerticalGroup(
+            pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                        .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardStaff1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, 0)
+                        .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btFindStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlCardStaff1Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(btAddStaffAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(326, Short.MAX_VALUE))
+        );
+
+        pnlCard.add(pnlCardStaff1, "Staff1");
+
+        pnlRegister.setBackground(new java.awt.Color(153, 255, 204));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("REGISTER");
+
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel18.setText("Fullname");
+
+        txtFullName2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFullName2FocusLost(evt);
+            }
+        });
+
+        jLabel20.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel20.setText("Email");
+
+        txtEmail2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtEmail2FocusLost(evt);
+            }
+        });
+
+        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel21.setText("Password");
+
+        txtPassword2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPassword2FocusLost(evt);
+            }
+        });
+
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel22.setText("Confirm Password");
+
+        txtConfirmPass2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtConfirmPass2FocusLost(evt);
+            }
+        });
+
+        btEyePass2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/hideEye.png"))); // NOI18N
+        btEyePass2.setContentAreaFilled(false);
+        btEyePass2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btEyePass2ActionPerformed(evt);
+            }
+        });
+
+        btRegister2.setBackground(new java.awt.Color(153, 255, 255));
+        btRegister2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btRegister2.setForeground(new java.awt.Color(178, 137, 145));
+        btRegister2.setText("Register");
+        btRegister2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRegister2ActionPerformed(evt);
+            }
+        });
+
+        fieldDay2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
+        fieldDay2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldDay2FocusLost(evt);
+            }
+        });
+
+        jLabel26.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel26.setText("Day");
+
+        fieldMonth2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        fieldMonth2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldMonth2FocusLost(evt);
+            }
+        });
+
+        jLabel31.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel31.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel31.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel31.setText("Month");
+
+        jLabel32.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel32.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel32.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel32.setText("Year");
+
+        fieldYear2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910", "1911", "1912", "1913", "1914", "1915", "1916", "1917", "1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970", "1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        fieldYear2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                fieldYear2FocusLost(evt);
+            }
+        });
+
+        GenderGroupRegister.add(btMale2);
+        btMale2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btMale2.setForeground(new java.awt.Color(178, 137, 145));
+        btMale2.setSelected(true);
+        btMale2.setText("Male");
+
+        GenderGroupRegister.add(btFemale2);
+        btFemale2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btFemale2.setForeground(new java.awt.Color(178, 137, 145));
+        btFemale2.setText("Female");
+
+        jLabel33.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel33.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel33.setText("Gender");
+
+        lblWarn2.setForeground(new java.awt.Color(255, 51, 51));
+
+        btExit2.setBackground(new java.awt.Color(153, 255, 255));
+        btExit2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btExit2.setForeground(new java.awt.Color(178, 137, 145));
+        btExit2.setText("Exit");
+        btExit2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btExit2ActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel2.setText("Branch");
+
+        txtBranch2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtBranch2FocusLost(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlRegisterLayout = new javax.swing.GroupLayout(pnlRegister);
+        pnlRegister.setLayout(pnlRegisterLayout);
+        pnlRegisterLayout.setHorizontalGroup(
+            pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(pnlRegisterLayout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlRegisterLayout.createSequentialGroup()
+                        .addComponent(txtPassword2, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btEyePass2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel21)
+                    .addGroup(pnlRegisterLayout.createSequentialGroup()
+                        .addComponent(btMale2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btFemale2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel33, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel22)
+                    .addComponent(jLabel20)
+                    .addComponent(jLabel18)
+                    .addComponent(txtFullName2, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(txtBranch2, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(txtEmail2, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlRegisterLayout.createSequentialGroup()
+                            .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(fieldDay2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(44, 44, 44)
+                            .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(fieldMonth2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                            .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel32, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(fieldYear2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jLabel2)
+                    .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(txtConfirmPass2)
+                        .addGroup(pnlRegisterLayout.createSequentialGroup()
+                            .addComponent(btExit2)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                            .addComponent(btRegister2))
+                        .addComponent(lblWarn2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(30, Short.MAX_VALUE))
+        );
+        pnlRegisterLayout.setVerticalGroup(
+            pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlRegisterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFullName2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel20)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtEmail2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtBranch2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel26)
+                    .addComponent(jLabel31)
+                    .addComponent(jLabel32))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fieldDay2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldMonth2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fieldYear2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel33)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btMale2)
+                    .addComponent(btFemale2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPassword2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btEyePass2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtConfirmPass2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblWarn2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 221, Short.MAX_VALUE)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlRegisterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btRegister2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btExit2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlCard.add(pnlCardHome, "Home");
+        fieldYear2.setSelectedIndex(105);
+
+        javax.swing.GroupLayout pnlCardStaff2Layout = new javax.swing.GroupLayout(pnlCardStaff2);
+        pnlCardStaff2.setLayout(pnlCardStaff2Layout);
+        pnlCardStaff2Layout.setHorizontalGroup(
+            pnlCardStaff2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardStaff2Layout.createSequentialGroup()
+                .addContainerGap(117, Short.MAX_VALUE)
+                .addComponent(pnlRegister, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(99, 99, 99))
+        );
+        pnlCardStaff2Layout.setVerticalGroup(
+            pnlCardStaff2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlRegister, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pnlCard.add(pnlCardStaff2, "Staff2");
 
         pnlCardProfile.setName(""); // NOI18N
 
@@ -949,18 +1610,229 @@ public class FormStaff extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardProfile, "Profile");
 
-        javax.swing.GroupLayout pnlCardMoneyLayout = new javax.swing.GroupLayout(pnlCardMoney);
-        pnlCardMoney.setLayout(pnlCardMoneyLayout);
-        pnlCardMoneyLayout.setHorizontalGroup(
-            pnlCardMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 581, Short.MAX_VALUE)
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Manage Transaction", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        tblManageTrans.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Trans ID", "Staff ID", "Decision", "Time"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblManageTrans.setGridColor(new java.awt.Color(102, 102, 102));
+        tblManageTrans.setRowHeight(30);
+        tblManageTrans.setSelectionBackground(new java.awt.Color(153, 255, 153));
+        tblManageTrans.setSelectionForeground(new java.awt.Color(0, 0, 153));
+        tblManageTrans.setShowGrid(true);
+        tblManageTrans.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblManageTransMouseClicked(evt);
+            }
+        });
+        jScrollPane5.setViewportView(tblManageTrans);
+
+        jLabel35.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel35.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel35.setText("Transaction ID");
+
+        jLabel36.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel36.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel36.setText("Staff ID");
+
+        fieldMonthManage1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+
+        jLabel37.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel37.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel37.setText("Time");
+
+        fieldYearManage1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030", " " }));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtTransManage)
+                    .addComponent(txtStaffManage1)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel35)
+                            .addComponent(jLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(fieldMonthManage1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(fieldYearManage1, 0, 1, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
-        pnlCardMoneyLayout.setVerticalGroup(
-            pnlCardMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 529, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel35)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtTransManage, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel36)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtStaffManage1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel37)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fieldMonthManage1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldYearManage1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 66, Short.MAX_VALUE))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        pnlCard.add(pnlCardMoney, "cardMoney");
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Manage Account", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 12), new java.awt.Color(153, 153, 255))); // NOI18N
+
+        tblManageAcc.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Account ID", "Staff ID", "Decision", "Time"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblManageAcc.setGridColor(new java.awt.Color(102, 102, 102));
+        tblManageAcc.setRowHeight(30);
+        tblManageAcc.setSelectionBackground(new java.awt.Color(153, 255, 153));
+        tblManageAcc.setSelectionForeground(new java.awt.Color(0, 0, 153));
+        tblManageAcc.setShowGrid(true);
+        jScrollPane6.setViewportView(tblManageAcc);
+
+        jLabel38.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel38.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel38.setText("Account ID");
+
+        jLabel39.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel39.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel39.setText("Staff ID");
+
+        jLabel40.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel40.setForeground(new java.awt.Color(178, 137, 145));
+        jLabel40.setText("Time");
+
+        fieldMonthManage2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+
+        fieldYearManage2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030", " " }));
+        fieldYearManage2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldYearManage2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtStaffManage2)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel38)
+                            .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(fieldMonthManage2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(fieldYearManage2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtAccManage))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel38)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtAccManage, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel39)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtStaffManage2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel40)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fieldMonthManage2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldYearManage2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 9, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout pnlCardManageLayout = new javax.swing.GroupLayout(pnlCardManage);
+        pnlCardManage.setLayout(pnlCardManageLayout);
+        pnlCardManageLayout.setHorizontalGroup(
+            pnlCardManageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardManageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCardManageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(15, 15, 15))
+        );
+        pnlCardManageLayout.setVerticalGroup(
+            pnlCardManageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardManageLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnlCard.add(pnlCardManage, "Manage");
 
         tblTransactionS.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1036,7 +1908,7 @@ public class FormStaff extends javax.swing.JFrame {
 
         btFindS.setBackground(new java.awt.Color(153, 255, 255));
         btFindS.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btFindS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Find.png"))); // NOI18N
+        btFindS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/find.png"))); // NOI18N
         btFindS.setText(" Find");
         btFindS.setFocusPainted(false);
         btFindS.setFocusable(false);
@@ -1145,8 +2017,8 @@ public class FormStaff extends javax.swing.JFrame {
                             .addGroup(pnlCardSearchLayout.createSequentialGroup()
                                 .addComponent(jLabel16)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtCustomerID)
-                            .addComponent(btActivate, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .addComponent(txtCusSearch)
+                            .addComponent(btActivate, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                             .addComponent(lblWarnS, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(12, 12, 12)
                         .addGroup(pnlCardSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1173,7 +2045,7 @@ public class FormStaff extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardSearchLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btFindS, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtCustomerID))
+                    .addComponent(txtCusSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlCardSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel27)
@@ -1275,7 +2147,7 @@ public class FormStaff extends javax.swing.JFrame {
 
         btFindA.setBackground(new java.awt.Color(153, 255, 255));
         btFindA.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btFindA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Find.png"))); // NOI18N
+        btFindA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/find.png"))); // NOI18N
         btFindA.setText("Find");
         btFindA.setFocusPainted(false);
         btFindA.setOpaque(true);
@@ -1323,7 +2195,7 @@ public class FormStaff extends javax.swing.JFrame {
             .addGroup(pnlCardAuthorizeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlCardAuthorizeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
                     .addGroup(pnlCardAuthorizeLayout.createSequentialGroup()
                         .addGroup(pnlCardAuthorizeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlCardAuthorizeLayout.createSequentialGroup()
@@ -1396,37 +2268,91 @@ public class FormStaff extends javax.swing.JFrame {
 
         pnlCard.add(pnlCardAuthorize, "Authorize");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(jTable1);
+        bt1Week.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Week.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Week.setText("1 Week");
+
+        pnlPie1.setLayout(new java.awt.BorderLayout());
+
+        pnlPie2.setLayout(new java.awt.BorderLayout());
+
+        bt1Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Month.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Month.setText("1 Month");
+
+        bt6Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt6Month.setForeground(new java.awt.Color(102, 102, 102));
+        bt6Month.setText("6 Month");
+
+        bt1Year.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Year.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Year.setText("1 Year");
+
+        btAllTime.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btAllTime.setForeground(new java.awt.Color(102, 102, 102));
+        btAllTime.setText("ALL");
+
+        jTextField1.setBackground(new java.awt.Color(0, 0, 0));
+
+        pnlCategory.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
         pnlCardStatics.setLayout(pnlCardStaticsLayout);
         pnlCardStaticsLayout.setHorizontalGroup(
             pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                .addGap(56, 56, 56)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(bt1Week)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt6Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Year)
+                        .addGap(18, 18, 18)
+                        .addComponent(btAllTime)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField1)
+                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                                .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 15, Short.MAX_VALUE))
+                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                                .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)))))
+                .addContainerGap())
         );
         pnlCardStaticsLayout.setVerticalGroup(
             pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(bt6Month, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btAllTime, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(pnlCategory, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        pnlCard.add(pnlCardStatics, "card7");
+        pnlCard.add(pnlCardStatics, "statics");
 
         lblMemberID.setBackground(new java.awt.Color(153, 255, 255));
         lblMemberID.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -1450,19 +2376,15 @@ public class FormStaff extends javax.swing.JFrame {
                     .addComponent(pnlMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lblLineCol1, javax.swing.GroupLayout.DEFAULT_SIZE, 1, Short.MAX_VALUE)
+                .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblLineCol1, javax.swing.GroupLayout.DEFAULT_SIZE, 1, Short.MAX_VALUE)
-                        .addGap(0, 1, Short.MAX_VALUE)
-                        .addComponent(pnlTop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblLineRow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblLineCol2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, 0)
-                                .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))))
+                        .addComponent(lblLineCol2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(pnlCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlTop, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1505,15 +2427,13 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void btSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSearchActionPerformed
         // TODO add your handling code here:
-        
-        
         cardLayout3.show(pnlCard, "Search");
     }//GEN-LAST:event_btSearchActionPerformed
 
-    private void btMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMoneyActionPerformed
+    private void btManageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btManageActionPerformed
         // TODO add your handling code here:
-        cardLayout3.show(pnlCard, "cardMoney");
-    }//GEN-LAST:event_btMoneyActionPerformed
+        cardLayout3.show(pnlCard, "Manage");
+    }//GEN-LAST:event_btManageActionPerformed
 
     private void btAuthorizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_btAuthorizeFocusLost
         // TODO add your handling code here:
@@ -1675,10 +2595,10 @@ public class FormStaff extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btChangePass3ActionPerformed
 
-    private void btHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btHomeActionPerformed
+    private void btStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaffActionPerformed
         // TODO add your handling code here:
-        cardLayout3.show(pnlCard, "Home");
-    }//GEN-LAST:event_btHomeActionPerformed
+        cardLayout3.show(pnlCard, "Staff1");
+    }//GEN-LAST:event_btStaffActionPerformed
 
     private void btProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btProfileActionPerformed
         // TODO add your handling code here:
@@ -1745,9 +2665,9 @@ public class FormStaff extends javax.swing.JFrame {
         // TODO add your handling code here:
         searchCusTBMD.setRowCount(0);
         searchTransTBMD.setRowCount(0);
-        Account customerSearch = accController.getAccountByID(txtCustomerID.getText());
+        Account customerSearch = accController.getAccountByID(txtCusSearch.getText());
         if(customerSearch == null){
-            if(txtCustomerID.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
+            if(txtCusSearch.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
             else lblWarnS.setText("CustomerID is not found");
             Timer clearWarning = new Timer(2000, e -> lblWarnS.setText(""));
             clearWarning.setRepeats(false);
@@ -1759,7 +2679,7 @@ public class FormStaff extends javax.swing.JFrame {
             customerSearch.getGender(), customerSearch.getBirthDay().format(fmForBirth), 
             String.valueOf(customerSearch.isActive()).toUpperCase()});
         
-        List<Transaction> lst = transController.filterTransactions(txtCustomerID.getText(), 
+        List<Transaction> lst = transController.filterTransactions(txtCusSearch.getText(), 
                 fieldBeginMonthS.getSelectedIndex() + 1, fieldBeginYearS.getSelectedIndex() + 1900,
                 fieldEndMonthS.getSelectedIndex() + 1, fieldEndYearS.getSelectedIndex() + 1900, 
                 fieldTypeS.getSelectedItem().toString(), fieldStatusS.getSelectedItem().toString());
@@ -1798,6 +2718,7 @@ public class FormStaff extends javax.swing.JFrame {
                     "", JOptionPane.YES_NO_OPTION);
         if(choice == 0){
             if(stfController.confirmTransaction(transID, senderID, receiverID, type, amount)){
+                authController.addTransAuthorize(myAccount.getId(), transID, "CONFIRM");
                 JOptionPane.showMessageDialog(this, "Confirm Successfully!", "", JOptionPane.INFORMATION_MESSAGE);
             }
             else{
@@ -1816,6 +2737,7 @@ public class FormStaff extends javax.swing.JFrame {
                     "", JOptionPane.YES_NO_OPTION);
         if(choice == 0){
             if(TransactionDAO.getInstance().updateStatus(transID, "FAILED")){
+                authController.addTransAuthorize(myAccount.getId(), transID, "REJECT");
                 JOptionPane.showMessageDialog(this, "Reject Successfully!", "", JOptionPane.INFORMATION_MESSAGE);
             }
             else{
@@ -1827,13 +2749,14 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
         // TODO add your handling code here:
+        cardLayout3.show(pnlCard, "statics");
     }//GEN-LAST:event_btStaticsActionPerformed
 
     private void btActivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btActivateActionPerformed
         // TODO add your handling code here:
-        Account acc = accController.getAccountByID(txtCustomerID.getText());
+        Account acc = accController.getAccountByID(txtCusSearch.getText());
         if(acc == null || acc.getDegree() >= myAccount.getDegree()){
-            if(txtCustomerID.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
+            if(txtCusSearch.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
             else lblWarnS.setText("CustomerID is not found");
             Timer clearWarning = new Timer(2000, e -> lblWarnS.setText(""));
             clearWarning.setRepeats(false);
@@ -1846,6 +2769,7 @@ public class FormStaff extends javax.swing.JFrame {
                                     "", JOptionPane.YES_NO_OPTION);
         if(choice == 0){
             if(accController.updateObjectActive(acc.getId(), true)){
+                authController.addAccAuthorize(myAccount.getId(), acc.getId(), "ACTIVATE");
                 JOptionPane.showMessageDialog(this, "Activate account successfully!", 
                         "", JOptionPane.INFORMATION_MESSAGE);
                 btFindS.doClick();
@@ -1860,9 +2784,9 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void btDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeactivateActionPerformed
         // TODO add your handling code here:
-        Account acc = accController.getAccountByID(txtCustomerID.getText());
+        Account acc = accController.getAccountByID(txtCusSearch.getText());
         if(acc == null || acc.getDegree() >= myAccount.getDegree()){
-            if(txtCustomerID.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
+            if(txtCusSearch.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
             else lblWarnS.setText("CustomerID is not found");
             Timer clearWarning = new Timer(2000, e -> lblWarnS.setText(""));
             clearWarning.setRepeats(false);
@@ -1875,6 +2799,7 @@ public class FormStaff extends javax.swing.JFrame {
                                     "", JOptionPane.YES_NO_OPTION);
         if(choice == 0){
             if(accController.updateObjectActive(acc.getId(), false)){
+                authController.addAccAuthorize(myAccount.getId(), acc.getId(), "DEACTIVATE");
                 JOptionPane.showMessageDialog(this, "Deactivate account successfully!", 
                         "", JOptionPane.INFORMATION_MESSAGE);
                 btFindS.doClick();
@@ -1885,6 +2810,227 @@ public class FormStaff extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btDeactivateActionPerformed
+
+    private void resetRegister2(){
+        JTextField[] arr = {txtFullName2, txtEmail2, txtBranch2, txtPassword2, txtConfirmPass2};
+        for(JTextField x : arr){
+            x.setText("");
+            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            
+        } 
+        lblWarn2.setText(""); 
+        txtPassword2.setEchoChar('•');
+        btEyePass2.setIcon(closeEyeImage);
+        isOpenEye2 = false;
+        fieldDay2.setSelectedIndex(0); fieldMonth2.setSelectedIndex(0); fieldYear2.setSelectedIndex(105);
+        btMale2.setSelected(true); 
+    }
+    private void txtFullName2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName2FocusLost
+        // TODO add your handling code here:
+        txtFullName2.setText(txtFullName2.getText().trim().toUpperCase());
+        if(txtFullName2.getText().isEmpty()){
+            txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtFullName2FocusLost
+
+    private void txtEmail2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEmail2FocusLost
+        // TODO add your handling code here:
+        txtEmail2.setText(txtEmail2.getText().trim());
+        if(txtEmail2.getText().isEmpty()){
+            txtEmail2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtEmail2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtEmail2FocusLost
+
+    private void txtPassword2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPassword2FocusLost
+        // TODO add your handling code here:
+        txtPassword2.setText(txtPassword2.getText().trim());
+        if(txtPassword2.getText().isEmpty()){
+            txtPassword2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtPassword2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtPassword2FocusLost
+
+    private void txtConfirmPass2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtConfirmPass2FocusLost
+        // TODO add your handling code here:
+        txtConfirmPass2.setText(txtConfirmPass2.getText().trim());
+        if(txtConfirmPass2.getText().isEmpty()){
+            txtConfirmPass2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtConfirmPass2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtConfirmPass2FocusLost
+
+    private boolean isOpenEye2 = false;
+    private void btEyePass2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEyePass2ActionPerformed
+        // TODO add your handling code here:
+        if(isOpenEye2){
+            txtPassword2.setEchoChar('•');
+            btEyePass2.setIcon(closeEyeImage);
+            isOpenEye2 = false;
+        }
+        else{
+            txtPassword2.setEchoChar((char) 0);
+            btEyePass2.setIcon(openEyeImage);
+            isOpenEye2 = true;
+        }
+    }//GEN-LAST:event_btEyePass2ActionPerformed
+
+    private void btRegister2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegister2ActionPerformed
+        // TODO add your handling code here:
+        lblWarn2.setText("");
+        String pass = txtPassword2.getText().trim(), confirmPass = txtConfirmPass2.getText().trim();
+        String fullName = txtFullName2.getText().trim(), email = txtEmail2.getText().trim();
+        String gender = "Male"; if(btFemale2.isSelected()) gender = "Female";
+        String branch = txtBranch2.getText();
+        String day = fieldDay2.getSelectedItem().toString() + "/"
+        + fieldMonth2.getSelectedItem().toString() + "/"
+        + fieldYear2.getSelectedItem().toString();
+        LocalDate birthDay = LocalDate.parse(day, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        String emailRegex = "^[A-Za-z0-9]+([._%+\\-][A-Za-z0-9]+)*@"
+        + "[A-Za-z0-9](?:[A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?"
+        + "(?:\\.[A-Za-z0-9](?:[A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?)+$";
+        if(fullName.isEmpty()){
+            txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
+        }
+        if(email.isEmpty()){
+            txtEmail2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
+        }
+        if(!email.matches(emailRegex)){
+            lblWarn2.setText("Invalid email address");
+            return;
+        }
+        if(branch.isEmpty()){
+            txtBranch2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
+        }
+        if(pass.length() < 6){
+            lblWarn2.setText("Password must be at least 6 characters long");
+            return;
+        }
+        if(pass.isEmpty()){
+            txtPassword2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
+        }
+        if(confirmPass.isEmpty()){
+            txtConfirmPass2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
+        }
+        if(!pass.equals(confirmPass)){
+            lblWarn2.setText("Password does not match");
+            return;
+        }
+        Account x = accController.getAccountByEmail(email);
+        if(x != null){
+            if(x.isActive()) lblWarn2.setText("Account already exists");
+            else{
+                JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
+            }
+            return;
+        }
+        if(!new OTPDialog(this, myAccount.getEmail(), "xác thực tài khoản").isMatch()){
+            return;
+        }
+        Account ac = new Staff(fullName, email, pass, gender, birthDay, true , branch);
+        if(accController.addAccount(ac) > 0){
+            resetRegister2();
+            JOptionPane.showMessageDialog(this, "Register completely", "", JOptionPane.INFORMATION_MESSAGE);
+        }
+        // cardLayout3.show(pnlCard, "Staff1");
+    }//GEN-LAST:event_btRegister2ActionPerformed
+
+    private void fieldDay2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldDay2FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay2.getSelectedItem().toString() + "/"
+        + fieldMonth2.getSelectedItem().toString() + "/"
+        + fieldYear2.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay2.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth2.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear2.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldDay2FocusLost
+
+    private void fieldMonth2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldMonth2FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay2.getSelectedItem().toString() + "/"
+        + fieldMonth2.getSelectedItem().toString() + "/"
+        + fieldYear2.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay2.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth2.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear2.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldMonth2FocusLost
+
+    private void fieldYear2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldYear2FocusLost
+        // TODO add your handling code here:
+        String ss = fieldDay2.getSelectedItem().toString() + "/"
+        + fieldMonth2.getSelectedItem().toString() + "/"
+        + fieldYear2.getSelectedItem().toString();
+        LocalDate date = LocalDate.parse(ss, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        fieldDay2.setSelectedIndex(date.getDayOfMonth() - 1);
+        fieldMonth2.setSelectedIndex(date.getMonthValue() - 1);
+        fieldYear2.setSelectedIndex(date.getYear() - 1900);
+    }//GEN-LAST:event_fieldYear2FocusLost
+
+    private void btExit2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExit2ActionPerformed
+        // TODO add your handling code here:
+        cardLayout3.show(pnlCard, "Staff1");
+    }//GEN-LAST:event_btExit2ActionPerformed
+
+    private void btAddStaffAccActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAddStaffAccActionPerformed
+        // TODO add your handling code here:
+        resetRegister2();
+        cardLayout3.show(pnlCard, "Staff2");
+    }//GEN-LAST:event_btAddStaffAccActionPerformed
+
+    private void txtBranch2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBranch2FocusLost
+        // TODO add your handling code here:
+        txtBranch2.setText(txtBranch2.getText().trim());
+        if(txtBranch2.getText().isEmpty()){
+            txtBranch2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+        else{
+            txtBranch2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+        }
+    }//GEN-LAST:event_txtBranch2FocusLost
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void fieldYearManage2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldYearManage2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldYearManage2ActionPerformed
+
+    private void tblManageTransMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblManageTransMouseClicked
+        // TODO add your handling code here:
+        if(evt.getClickCount() == 2 && !evt.isConsumed()){
+            int row = tblManageTrans.rowAtPoint(evt.getPoint());
+            if(row != -1){
+                String transID = tblManageTrans.getValueAt(row, 0).toString();
+                // System.out.println(transID);
+                String decision = tblManageTrans.getValueAt(row, 2).toString();
+                new FormTransaction(transID, decision);
+            }
+            evt.consume();
+        }
+    }//GEN-LAST:event_tblManageTransMouseClicked
+
+    private void btLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogoutActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        new FormLogin();
+    }//GEN-LAST:event_btLogoutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1908,46 +3054,68 @@ public class FormStaff extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "thiennhan11a1@gmail.com";
+        String email = "stf001@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormStaff(email).setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GenderGroup3;
+    private javax.swing.ButtonGroup GenderGroupRegister;
+    private javax.swing.JButton bt1Month;
+    private javax.swing.JButton bt1Week;
+    private javax.swing.JButton bt1Year;
+    private javax.swing.JButton bt6Month;
     private javax.swing.JButton btActivate;
+    private javax.swing.JButton btAddStaffAcc;
+    private javax.swing.JButton btAllTime;
     private javax.swing.JButton btAuthorize;
     private javax.swing.JButton btChangePass3;
     private javax.swing.JButton btConfirm;
     private javax.swing.JButton btDeactivate;
+    private javax.swing.JButton btExit2;
+    private javax.swing.JButton btEyePass2;
     private javax.swing.JButton btEyePass3;
+    private javax.swing.JRadioButton btFemale2;
     private javax.swing.JRadioButton btFemale3;
     private javax.swing.JButton btFindA;
     private javax.swing.JButton btFindS;
-    private javax.swing.JButton btHome;
+    private javax.swing.JButton btFindStaff;
     private javax.swing.JButton btLogout;
+    private javax.swing.JRadioButton btMale2;
     private javax.swing.JRadioButton btMale3;
-    private javax.swing.JButton btMoney;
+    private javax.swing.JButton btManage;
     private javax.swing.JButton btProfile;
+    private javax.swing.JButton btRegister2;
     private javax.swing.JButton btReject;
     private javax.swing.JButton btReset3;
     private javax.swing.JButton btSaveInfo3;
     private javax.swing.JButton btSearch;
+    private javax.swing.JButton btStaff;
     private javax.swing.JButton btStatics;
     private javax.swing.JComboBox<String> fieldBeginMonthA;
     private javax.swing.JComboBox<String> fieldBeginMonthS;
     private javax.swing.JComboBox<String> fieldBeginYearA;
     private javax.swing.JComboBox<String> fieldBeginYearS;
+    private javax.swing.JComboBox<String> fieldDay2;
     private javax.swing.JComboBox<String> fieldDay3;
     private javax.swing.JComboBox<String> fieldEndMonthA;
     private javax.swing.JComboBox<String> fieldEndMonthS;
     private javax.swing.JComboBox<String> fieldEndYearA;
     private javax.swing.JComboBox<String> fieldEndYearS;
+    private javax.swing.JComboBox<String> fieldMonth2;
     private javax.swing.JComboBox<String> fieldMonth3;
+    private javax.swing.JComboBox<String> fieldMonthManage1;
+    private javax.swing.JComboBox<String> fieldMonthManage2;
     private javax.swing.JComboBox<String> fieldStatusS;
     private javax.swing.JComboBox<String> fieldTypeA;
     private javax.swing.JComboBox<String> fieldTypeS;
+    private javax.swing.JComboBox<String> fieldYear2;
     private javax.swing.JComboBox<String> fieldYear3;
+    private javax.swing.JComboBox<String> fieldYearManage1;
+    private javax.swing.JComboBox<String> fieldYearManage2;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1957,27 +3125,49 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
+    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel lblBranch;
     private javax.swing.JLabel lblEmail3;
     private javax.swing.JLabel lblFullName3;
@@ -1988,28 +3178,45 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JLabel lblMemberID;
     private javax.swing.JLabel lblPositon;
     private javax.swing.JLabel lblProfile;
+    private javax.swing.JLabel lblWarn2;
     private javax.swing.JLabel lblWarnS;
     private javax.swing.JLabel lblWarnSavePass3;
     private javax.swing.JPanel pnlCard;
     private javax.swing.JPanel pnlCardAuthorize;
-    private javax.swing.JPanel pnlCardHome;
-    private javax.swing.JPanel pnlCardMoney;
+    private javax.swing.JPanel pnlCardManage;
     private javax.swing.JPanel pnlCardProfile;
     private javax.swing.JPanel pnlCardSearch;
+    private javax.swing.JPanel pnlCardStaff1;
+    private javax.swing.JPanel pnlCardStaff2;
     private javax.swing.JPanel pnlCardStatics;
+    private javax.swing.JPanel pnlCategory;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
+    private javax.swing.JPanel pnlPie1;
+    private javax.swing.JPanel pnlPie2;
+    private javax.swing.JPanel pnlRegister;
     private javax.swing.JPanel pnlSubProfile1;
     private javax.swing.JPanel pnlSubProfile2;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JTable tblAuthorize;
     private javax.swing.JTable tblCustomerS;
+    private javax.swing.JTable tblManageAcc;
+    private javax.swing.JTable tblManageTrans;
     private javax.swing.JTable tblTransactionS;
+    private javax.swing.JTextField txtAccManage;
+    private javax.swing.JTextField txtBranch2;
+    private javax.swing.JPasswordField txtConfirmPass2;
     private javax.swing.JPasswordField txtConfirmPass3;
-    private javax.swing.JFormattedTextField txtCustomerID;
+    private javax.swing.JFormattedTextField txtCusSearch;
+    private javax.swing.JTextField txtEmail2;
+    private javax.swing.JTextField txtFullName2;
     private javax.swing.JTextField txtFullName3;
+    private javax.swing.JPasswordField txtPassword2;
     private javax.swing.JPasswordField txtPassword3;
     private javax.swing.JFormattedTextField txtReceiverID;
     private javax.swing.JFormattedTextField txtSenderID;
+    private javax.swing.JTextField txtStaffManage1;
+    private javax.swing.JTextField txtStaffManage2;
+    private javax.swing.JTextField txtTransManage;
     // End of variables declaration//GEN-END:variables
 }

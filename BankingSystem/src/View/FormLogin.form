@@ -190,7 +190,7 @@
             <Component class="javax.swing.JButton" name="btEyePass1">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/MyImage/seenEye.png"/>
+                  <Image iconType="3" name="/MyImage/hideEye.png"/>
                 </Property>
                 <Property name="contentAreaFilled" type="boolean" value="false"/>
               </Properties>
@@ -470,7 +470,7 @@
             <Component class="javax.swing.JButton" name="btEyePass2">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/MyImage/seenEye.png"/>
+                  <Image iconType="3" name="/MyImage/hideEye.png"/>
                 </Property>
                 <Property name="contentAreaFilled" type="boolean" value="false"/>
               </Properties>

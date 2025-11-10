@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormCustomer.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/DAO/TransactionDAO.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormLogin.java</file>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormStaff.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/DAO/AuthorizeDAO.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormTransaction.java</file>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Process/testAccount.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/TestChart.java</file>
         </group>
     </open-files>
 </project-private>

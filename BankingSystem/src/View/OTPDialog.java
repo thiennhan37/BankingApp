@@ -26,7 +26,7 @@ public class OTPDialog extends JDialog{
     private JTextField otpField;
     private JButton resendButton, okButton;
     private String serverOTP;
-    private boolean match;
+    private boolean match = false;
     private Timer ttl;
     public OTPDialog(JFrame par, String toEmail, String typeMess) {
         super(par, "Verify OTP", true);
