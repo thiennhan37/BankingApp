@@ -77,7 +77,7 @@ public class OTPDialog extends JDialog{
                 dispose();
             }
             else{
-                JOptionPane.showMessageDialog(this, "Invalid OTP. Please check and try again", "",
+                JOptionPane.showMessageDialog(this, "Wrong OTP. Please check and try again", "",
                         JOptionPane.WARNING_MESSAGE);
             }
         });

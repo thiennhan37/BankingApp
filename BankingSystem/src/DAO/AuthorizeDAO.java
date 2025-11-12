@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 
 public class AuthorizeDAO {
     public static AuthorizeDAO getInstance(){
@@ -146,4 +147,47 @@ public class AuthorizeDAO {
         return result;
     }
 
+    public Integer[] staticsForStaff(String staffID, LocalDate time){
+        Integer[] result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Connection c = MyDatabase.getConnection();
+        PreparedStatement statement1 = null, statement2 = null;
+        ResultSet rs1 = null, rs2 = null;
+        try{
+            String command1 = "SELECT COUNT(*) AS COUNT1 FROM trans_manage WHERE staffID = ? AND YEAR(time) = ? AND MONTH(time) = ?;";
+            String command2 = "SELECT COUNT(*) AS COUNT2 FROM account_manage WHERE staffID = ? AND YEAR(time) = ? AND MONTH(time) = ?;";
+            for(int i = 4; i >= 0; i--){
+                LocalDate tmp = time.minusMonths(i);
+                statement1 = c.prepareStatement(command1);
+                statement2 = c.prepareStatement(command2);
+                
+                statement1.setString(1, staffID);
+                statement1.setInt(2, tmp.getYear()); statement1.setInt(3, tmp.getMonthValue());
+                statement2.setString(1, staffID);
+                statement2.setInt(2, tmp.getYear()); statement2.setInt(3, tmp.getMonthValue());
+                rs1 = statement1.executeQuery(); rs1.next();
+                rs2 = statement2.executeQuery(); rs2.next();
+                
+                result[(4 - i) * 2] = rs1.getInt("COUNT1");
+                result[(4 - i) * 2 + 1] = rs2.getInt("COUNT2");
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        finally{
+            if(statement1 != null){
+                try{statement1.close();} catch(SQLException ex){};
+            }
+            if(statement2 != null){
+                try{statement2.close();} catch(SQLException ex){};
+            }
+            if(rs1 != null){
+                try{rs1.close();} catch(SQLException ex){};
+            }
+            if(rs2 != null){
+                try{rs2.close();} catch(SQLException ex){};
+            }
+        }
+        return result;
+    }
 }

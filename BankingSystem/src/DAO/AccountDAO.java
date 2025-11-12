@@ -255,6 +255,10 @@ public class AccountDAO implements DAOInterface<Account>{
                 String branch = rs.getString("branch");
                 ac = new Staff(id, fullName, email, password, gender, birthDay, active, branch);
             }
+            else{
+                String branch = rs.getString("branch");
+                ac = new Manager(id, fullName, email, password, gender, birthDay, active, branch);
+            }
         }
         catch(SQLException e){
             

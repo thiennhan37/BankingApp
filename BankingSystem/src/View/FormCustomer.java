@@ -107,8 +107,29 @@ public class FormCustomer extends javax.swing.JFrame {
         btAll.doClick(); btHome.doClick(); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        autoReset();
         this.setVisible(true);
+        
     } 
+    private Timer myTime;
+    private void autoReset(){
+        myTime = new Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resetByTimer();
+            }
+        });
+        myTime.start();
+    }
+    private void resetByTimer(){
+        myAccount = accController.getAccountByEmail(myEmail);
+        lblBalance3.setText(numberFormat.format(myAccount.getBalace()));
+        if(!myAccount.isActive()){
+            myTime.stop();
+            this.dispose();
+            new FormLogin();
+        }
+    }
     private void settingGUIComponent(){
         JComponent[] btArr = {btSaveInfo3, btChangePass3, btTransfer3, btWithdraw3, btDeposit3};
         for(JComponent x : btArr){
@@ -231,6 +252,8 @@ public class FormCustomer extends javax.swing.JFrame {
         
         lblBalance3.setText(numberFormat.format(myAccount.getBalace()));
     }
+    
+
     private void resetAccount(){
         myAccount = accController.getAccountByEmail(myEmail);
         resetAccountInfo();
@@ -2089,6 +2112,9 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void btLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogoutActionPerformed
         // TODO add your handling code here:
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to logout?", 
+                "", JOptionPane.YES_NO_OPTION);
+        if(choice != 0) return;
         this.dispose();
         new FormLogin();
     }//GEN-LAST:event_btLogoutActionPerformed

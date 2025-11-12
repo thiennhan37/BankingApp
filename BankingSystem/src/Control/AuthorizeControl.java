@@ -7,6 +7,7 @@ package Control;
 import DAO.AuthorizeDAO;
 import Model.AccountManage;
 import Model.TransactionManage;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -27,5 +28,8 @@ public class AuthorizeControl {
     
     public List<AccountManage> filterAccManage(String transID, String staffID, int year, int month){
         return authorizeDAO.filterAccManage(transID, staffID, year, month);
+    }
+    public Integer[] staticsForStaff(String staffID, LocalDate time){
+        return authorizeDAO.staticsForStaff(staffID, time);
     }
 }

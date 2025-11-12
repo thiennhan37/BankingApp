@@ -11,6 +11,7 @@ import Control.TransactionControl;
 import DAO.TransactionDAO;
 import Model.Account;
 import Model.AccountManage;
+import Model.Customer;
 import Model.Staff;
 import Model.Transaction;
 import Model.TransactionManage;
@@ -37,6 +38,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import org.jfree.chart.ChartFactory;
@@ -76,7 +78,7 @@ public class FormStaff extends javax.swing.JFrame {
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private ImageIcon FemaleAdmin = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemaleAdmin.png"));
-    private DefaultTableModel authorizeTableModel, searchCusTBMD, searchTransTBMD, manageAccTBMD, manageTransTBMD;
+    private DefaultTableModel authorizeTableModel, searchCusTBMD, searchTransTBMD, manageAccTBMD, manageTransTBMD, staffInfoTBMD;
     private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));;
     private DateTimeFormatter fm2Y = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
     private DateTimeFormatter fm4Y = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -86,7 +88,7 @@ public class FormStaff extends javax.swing.JFrame {
             color2 = new Color(171, 245, 232),
             color3 = new Color(89, 222, 198);
     private DefaultPieDataset datasetPie1, datasetPie2;
-    private DefaultCategoryDataset datasetCategory;
+    private DefaultCategoryDataset datasetCategory, datasetCategoryStaff;
     public FormStaff(String myEmail) {
         try {
             FlatLightLaf.setup();
@@ -105,7 +107,6 @@ public class FormStaff extends javax.swing.JFrame {
         }
         if(myAccount.getGender().equals("Female")){
             lblProfile.setIcon(FemaleAdmin);
-            // btFemale3.setSelected(true); 
         }
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
@@ -114,6 +115,7 @@ public class FormStaff extends javax.swing.JFrame {
         searchTransTBMD = (DefaultTableModel) tblTransactionS.getModel();
         manageTransTBMD = (DefaultTableModel) tblManageTrans.getModel();
         manageAccTBMD = (DefaultTableModel) tblManageAcc.getModel();
+        staffInfoTBMD = (DefaultTableModel) tblStaffInfo.getModel();
         settingGUIComponent();
         setMouseList(); 
         setRestrict();
@@ -121,7 +123,28 @@ public class FormStaff extends javax.swing.JFrame {
         addForStat(); btAllTime.doClick(); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        autoReset();
+        this.setVisible(true);
     } 
+    
+    private Timer myTime;
+    private void autoReset(){
+        myTime = new Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resetByTimer();
+            }
+        });
+        myTime.start();
+    }
+    private void resetByTimer(){
+        myAccount = accController.getAccountByEmail(myEmail);
+        if(!myAccount.isActive()){
+            myTime.stop();
+            this.dispose();
+            new FormLogin();
+        }
+    }
     private void settingGUIComponent(){
         JComponent[] btArr = {btSaveInfo3, btChangePass3};
         for(JComponent x : btArr){
@@ -146,7 +169,7 @@ public class FormStaff extends javax.swing.JFrame {
         JComponent[] txtArr = {txtFullName3, txtPassword3, txtConfirmPass3, 
             txtBranch2, txtEmail2, txtPassword2, txtConfirmPass2, txtFullName2, 
             txtTransManage, txtAccManage, txtStaffManage1, txtStaffManage2, 
-            txtSenderID, txtReceiverID,txtCusSearch};
+            txtSenderID, txtReceiverID,txtCusSearch, txtStaffInStaff};
         for(JComponent x : txtArr){
            x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
@@ -189,6 +212,8 @@ public class FormStaff extends javax.swing.JFrame {
         
         datasetCategory = new DefaultCategoryDataset();
         setCategoryChart();
+        datasetCategoryStaff = new DefaultCategoryDataset();
+        setCategoryChartForStaff();
         
         TableColumnModel transManageCLMD = tblManageTrans.getColumnModel();
         transManageCLMD.getColumn(0).setPreferredWidth(30);
@@ -202,6 +227,12 @@ public class FormStaff extends javax.swing.JFrame {
         accManageCLMD.getColumn(2).setPreferredWidth(40);
         accManageCLMD.getColumn(3).setPreferredWidth(60);
         
+        TableColumnModel staffInfoCLMD = tblStaffInfo.getColumnModel();
+        staffInfoCLMD.getColumn(0).setPreferredWidth(60);
+        staffInfoCLMD.getColumn(1).setPreferredWidth(120);
+        staffInfoCLMD.getColumn(2).setPreferredWidth(100);
+        staffInfoCLMD.getColumn(3).setPreferredWidth(50);
+        staffInfoCLMD.getColumn(4).setPreferredWidth(60);
     }   
     private void setRestrict(){
         JFormattedTextField[] arr = {txtSenderID, txtReceiverID, txtCusSearch};
@@ -527,8 +558,70 @@ public class FormStaff extends javax.swing.JFrame {
         plot.getRangeAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
         renderer.setDefaultItemLabelsVisible(true);
         
-        pnlCategory.add(chartPanel, BorderLayout.CENTER);
+        pnlCategoryStats.add(chartPanel, BorderLayout.CENTER);
         
+    }
+    
+    private void setCategoryChartForStaff(){ 
+        LocalDate now = LocalDate.now();
+        for(int i = 4; i >= 0; i--){
+            LocalDate x = now.minusMonths(i);
+            // System.out.println(x.getMonthValue() + " " + x.getYear());
+            datasetCategoryStaff.addValue(0, "Transactions", x.getMonthValue()+ "/" + x.getYear());
+            datasetCategoryStaff.addValue(0, "Accounts", x.getMonthValue()+ "/" + x.getYear());
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Transactions and Accounts Processed", // Tiêu đề
+                "Date",                            // Trục X
+                "Number Of Process",                    // Trục Y
+                datasetCategoryStaff,
+                PlotOrientation.VERTICAL,
+                true, true, false
+        );
+        
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        
+        NumberFormat vnFormat = NumberFormat.getInstance(myLocale);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setNumberFormatOverride(vnFormat);
+        // Giao diện ban đầu
+        plot.setBackgroundPaint(new Color(204,255,255));
+        plot.setRangeGridlinePaint(Color.GRAY);
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setSeriesPaint(0, new Color(231, 76, 60));  // Trans
+        renderer.setSeriesPaint(1, new Color(52, 73, 94)); // Accounts
+        
+       
+        plot.getDomainAxis().setCategoryMargin(0.4);
+        renderer.setItemMargin(0.0); 
+        
+        renderer.setDefaultToolTipGenerator(
+            new StandardCategoryToolTipGenerator("({0}, {1}) = {2} ", NumberFormat.getInstance(myLocale))
+        );
+        
+        chart.getTitle().setFont(new Font("Times New Roman", Font.BOLD, 18)); 
+        chart.getLegend().setItemFont(new Font("Times New Roman", Font.BOLD, 14)); 
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(350, 500));
+        
+        plot.getDomainAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        plot.getRangeAxis().setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 13));
+        renderer.setDefaultItemLabelsVisible(true);
+        
+        pnlCategoryStaff.add(chartPanel, BorderLayout.CENTER);
+        
+    }
+    private void setDataChartForStaff(String staffID){
+        LocalDate now = LocalDate.now();
+        Integer[] result = authController.staticsForStaff(staffID, now);
+        // System.out.println(Arrays.toString(result)); 
+        for(int i = 4; i >= 0; i--){
+            LocalDate x = now.minusMonths(i);
+            // System.out.println(x.getMonthValue() + " " + x.getYear());
+            datasetCategoryStaff.setValue(result[(4 - i) * 2], "Transactions", x.getMonthValue()+ "/" + x.getYear());
+            datasetCategoryStaff.setValue(result[(4 - i) * 2 + 1], "Accounts", x.getMonthValue()+ "/" + x.getYear());
+        }
     }
     
     private void setTransManage(){
@@ -649,7 +742,7 @@ public class FormStaff extends javax.swing.JFrame {
         bt1Year = new javax.swing.JButton();
         btAllTime = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
-        pnlCategory = new javax.swing.JPanel();
+        pnlCategoryStats = new javax.swing.JPanel();
         pnlCardProfile = new javax.swing.JPanel();
         pnlSubProfile1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -677,13 +770,14 @@ public class FormStaff extends javax.swing.JFrame {
         pnlCardStaff1 = new javax.swing.JPanel();
         btAddStaffAcc = new javax.swing.JButton();
         btFindStaff = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        txtStaffInStaff = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        lblWarnStaff = new javax.swing.JLabel();
+        btActivateStaff = new javax.swing.JButton();
+        btDeactivateStaff = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblStaffInfo = new javax.swing.JTable();
+        pnlCategoryStaff = new javax.swing.JPanel();
         pnlCardStaff2 = new javax.swing.JPanel();
         pnlRegister = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -1014,7 +1108,7 @@ public class FormStaff extends javax.swing.JFrame {
 
         jTextField1.setBackground(new java.awt.Color(0, 0, 0));
 
-        pnlCategory.setLayout(new java.awt.BorderLayout());
+        pnlCategoryStats.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
         pnlCardStatics.setLayout(pnlCardStaticsLayout);
@@ -1039,7 +1133,7 @@ public class FormStaff extends javax.swing.JFrame {
                         .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField1)
                             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                                .addComponent(pnlCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 15, Short.MAX_VALUE))
                             .addGroup(pnlCardStaticsLayout.createSequentialGroup()
                                 .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1068,7 +1162,7 @@ public class FormStaff extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(pnlCategory, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1361,62 +1455,95 @@ public class FormStaff extends javax.swing.JFrame {
         btFindStaff.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btFindStaff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/find.png"))); // NOI18N
         btFindStaff.setText("Find");
+        btFindStaff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btFindStaffActionPerformed(evt);
+            }
+        });
+
+        txtStaffInStaff.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtStaffInStaffFocusLost(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(178, 137, 145));
         jLabel4.setText("Staff ID");
 
-        jButton1.setBackground(new java.awt.Color(51, 255, 51));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setText("Activate");
+        lblWarnStaff.setForeground(new java.awt.Color(255, 51, 51));
 
-        jButton2.setBackground(new java.awt.Color(255, 51, 51));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton2.setText("Deactivate");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btActivateStaff.setBackground(new java.awt.Color(51, 255, 51));
+        btActivateStaff.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btActivateStaff.setText("Activate");
+        btActivateStaff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btActivateStaffActionPerformed(evt);
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        btDeactivateStaff.setBackground(new java.awt.Color(255, 51, 51));
+        btDeactivateStaff.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btDeactivateStaff.setText("Deactivate");
+        btDeactivateStaff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btDeactivateStaffActionPerformed(evt);
+            }
+        });
+
+        tblStaffInfo.setBackground(new java.awt.Color(204, 204, 204));
+        tblStaffInfo.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Full Name", "Email", "Branch", "Gender", "Activate"
             }
-        ));
-        jScrollPane3.setViewportView(jTable1);
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblStaffInfo.setEnabled(false);
+        tblStaffInfo.setRowHeight(30);
+        tblStaffInfo.setShowGrid(true);
+        jScrollPane3.setViewportView(tblStaffInfo);
+
+        pnlCategoryStaff.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout pnlCardStaff1Layout = new javax.swing.GroupLayout(pnlCardStaff1);
         pnlCardStaff1.setLayout(pnlCardStaff1Layout);
         pnlCardStaff1Layout.setHorizontalGroup(
             pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardStaff1Layout.createSequentialGroup()
-                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(20, 20, 20)
+                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pnlCardStaff1Layout.createSequentialGroup()
                         .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlCardStaff1Layout.createSequentialGroup()
-                                .addGap(35, 35, 35)
-                                .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(btFindStaff, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtStaffInStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4)
+                            .addComponent(lblWarnStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btFindStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(35, 35, 35)
                         .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(96, 96, 96)
+                            .addComponent(btActivateStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btDeactivateStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btAddStaffAcc))
-                    .addGroup(pnlCardStaff1Layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(26, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+                    .addComponent(pnlCategoryStaff, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         pnlCardStaff1Layout.setVerticalGroup(
             pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1428,22 +1555,23 @@ public class FormStaff extends javax.swing.JFrame {
                                 .addGap(14, 14, 14)
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtStaffInStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCardStaff1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btActivateStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lblWarnStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addGroup(pnlCardStaff1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btFindStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btDeactivateStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlCardStaff1Layout.createSequentialGroup()
                         .addGap(36, 36, 36)
                         .addComponent(btAddStaffAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(326, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnlCategoryStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pnlCard.add(pnlCardStaff1, "Staff1");
@@ -2681,7 +2809,13 @@ public class FormStaff extends javax.swing.JFrame {
             clearWarning.start();
             return;
         }
-        
+        if(customerSearch.isActive()){
+            btActivate.setEnabled(false); btDeactivate.setEnabled(true);
+        }
+        else{
+            btDeactivate.setEnabled(false); btActivate.setEnabled(true); 
+        }
+        btFindS.grabFocus();
         searchCusTBMD.addRow(new Object[]{customerSearch.getFullName(), customerSearch.getEmail(), 
             customerSearch.getGender(), customerSearch.getBirthDay().format(fmForBirth), 
             String.valueOf(customerSearch.isActive()).toUpperCase()});
@@ -2762,7 +2896,7 @@ public class FormStaff extends javax.swing.JFrame {
     private void btActivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btActivateActionPerformed
         // TODO add your handling code here:
         Account acc = accController.getAccountByID(txtCusSearch.getText());
-        if(acc == null || acc.getDegree() >= myAccount.getDegree()){
+        if(acc == null || !(acc instanceof Customer)){
             if(txtCusSearch.getText().isBlank()) lblWarnS.setText("Invalid CustomerID");
             else lblWarnS.setText("CustomerID is not found");
             Timer clearWarning = new Timer(2000, e -> lblWarnS.setText(""));
@@ -2939,10 +3073,7 @@ public class FormStaff extends javax.swing.JFrame {
         }
         Account x = accController.getAccountByEmail(email);
         if(x != null){
-            if(x.isActive()) lblWarn2.setText("Account already exists");
-            else{
-                JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
-            }
+            lblWarn2.setText("Account already exists");
             return;
         }
         if(!new OTPDialog(this, myAccount.getEmail(), "xác thực tài khoản").isMatch()){
@@ -2953,7 +3084,7 @@ public class FormStaff extends javax.swing.JFrame {
             resetRegister2();
             JOptionPane.showMessageDialog(this, "Register completely", "", JOptionPane.INFORMATION_MESSAGE);
         }
-        // cardLayout3.show(pnlCard, "Staff1");
+        cardLayout3.show(pnlCard, "Staff1");
     }//GEN-LAST:event_btRegister2ActionPerformed
 
     private void fieldDay2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldDay2FocusLost
@@ -3011,10 +3142,6 @@ public class FormStaff extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtBranch2FocusLost
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void fieldYearManage2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldYearManage2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fieldYearManage2ActionPerformed
@@ -3035,9 +3162,110 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void btLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLogoutActionPerformed
         // TODO add your handling code here:
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to logout?", 
+                "", JOptionPane.YES_NO_OPTION);
+        if(choice != 0) return;
         this.dispose();
         new FormLogin();
     }//GEN-LAST:event_btLogoutActionPerformed
+
+    private void btFindStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFindStaffActionPerformed
+        // TODO add your handling code here:
+        staffInfoTBMD.setRowCount(0);
+        setDataChartForStaff(txtStaffInStaff.getText()); 
+        Account stf = accController.getAccountByID(txtStaffInStaff.getText());
+        if(stf == null || stf instanceof Customer){
+            if(txtStaffInStaff.getText().isBlank()) lblWarnStaff.setText("Invalid StaffID");
+            else lblWarnStaff.setText("StaffID is not found");
+            Timer clearWarning = new Timer(2000, e -> lblWarnStaff.setText(""));
+            clearWarning.setRepeats(false);
+            clearWarning.start();
+            return;
+        }
+        if(stf.isActive()){
+            btActivateStaff.setEnabled(false); btDeactivateStaff.setEnabled(true);
+        }
+        else{
+            btDeactivateStaff.setEnabled(false); btActivateStaff.setEnabled(true); 
+        }
+        btFindStaff.grabFocus();
+        staffInfoTBMD.addRow(new Object[]{stf.getFullName(), stf.getEmail(), stf.getBranch(), stf.getGender(), (""+ stf.isActive()).toUpperCase()} );
+        
+
+    }//GEN-LAST:event_btFindStaffActionPerformed
+
+    private void txtStaffInStaffFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtStaffInStaffFocusLost
+        // TODO add your handling code here: 
+        txtStaffInStaff.setText(txtStaffInStaff.getText().toUpperCase());
+    }//GEN-LAST:event_txtStaffInStaffFocusLost
+
+    private void btActivateStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btActivateStaffActionPerformed
+        // TODO add your handling code here:
+        btFindStaff.doClick();
+        Account acc = accController.getAccountByID(txtStaffInStaff.getText());
+        if(acc == null || acc instanceof Customer){
+            if(txtStaffInStaff.getText().isBlank()) lblWarnStaff.setText("Invalid StaffID");
+            else lblWarnStaff.setText("StaffID is not found");
+            Timer clearWarning = new Timer(2000, e -> lblWarnStaff.setText(""));
+            clearWarning.setRepeats(false);
+            clearWarning.start();
+            return;
+        }
+        if(acc.getDegree() >= myAccount.getDegree()){
+            JOptionPane.showMessageDialog(this, "You can not have permission!", 
+                        "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(acc.isActive()) return;
+        int choice = JOptionPane.showConfirmDialog(this, "Activate account " + acc.getId() + "?", 
+                                    "", JOptionPane.YES_NO_OPTION);
+        if(choice == 0){
+            if(accController.updateObjectActive(acc.getId(), true)){
+                authController.addAccAuthorize(myAccount.getId(), acc.getId(), "ACTIVATE");
+                JOptionPane.showMessageDialog(this, "Activate account successfully!", 
+                        "", JOptionPane.INFORMATION_MESSAGE);
+                btFindStaff.doClick();
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Activate account failed!", 
+                        "", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btActivateStaffActionPerformed
+
+    private void btDeactivateStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeactivateStaffActionPerformed
+        // TODO add your handling code here:
+        btFindStaff.doClick();
+        Account acc = accController.getAccountByID(txtStaffInStaff.getText());
+        if(acc == null || acc instanceof Customer){
+            if(txtStaffInStaff.getText().isBlank()) lblWarnStaff.setText("Invalid StaffID");
+            else lblWarnStaff.setText("StaffID is not found");
+            Timer clearWarning = new Timer(2000, e -> lblWarnStaff.setText(""));
+            clearWarning.setRepeats(false);
+            clearWarning.start();
+            return;
+        }
+        if(acc.getDegree() >= myAccount.getDegree()){
+            JOptionPane.showMessageDialog(this, "You can not have permission!", 
+                        "", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(!acc.isActive()) return;
+        int choice = JOptionPane.showConfirmDialog(this, "Deactivate account " + acc.getId() + "?", 
+                                    "", JOptionPane.YES_NO_OPTION);
+        if(choice == 0){
+            if(accController.updateObjectActive(acc.getId(), false)){
+                authController.addAccAuthorize(myAccount.getId(), acc.getId(), "DEACTIVATE");
+                JOptionPane.showMessageDialog(this, "Deactivate account successfully!", 
+                        "", JOptionPane.INFORMATION_MESSAGE);
+                btFindStaff.doClick();
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Deactivate account failed!", 
+                        "", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btDeactivateStaffActionPerformed
 
     /**
      * @param args the command line arguments
@@ -3074,12 +3302,14 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JButton bt1Year;
     private javax.swing.JButton bt6Month;
     private javax.swing.JButton btActivate;
+    private javax.swing.JButton btActivateStaff;
     private javax.swing.JButton btAddStaffAcc;
     private javax.swing.JButton btAllTime;
     private javax.swing.JButton btAuthorize;
     private javax.swing.JButton btChangePass3;
     private javax.swing.JButton btConfirm;
     private javax.swing.JButton btDeactivate;
+    private javax.swing.JButton btDeactivateStaff;
     private javax.swing.JButton btExit2;
     private javax.swing.JButton btEyePass2;
     private javax.swing.JButton btEyePass3;
@@ -3121,8 +3351,6 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> fieldYear3;
     private javax.swing.JComboBox<String> fieldYearManage1;
     private javax.swing.JComboBox<String> fieldYearManage2;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -3150,7 +3378,6 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
@@ -3172,9 +3399,7 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel lblBranch;
     private javax.swing.JLabel lblEmail3;
     private javax.swing.JLabel lblFullName3;
@@ -3188,6 +3413,7 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JLabel lblWarn2;
     private javax.swing.JLabel lblWarnS;
     private javax.swing.JLabel lblWarnSavePass3;
+    private javax.swing.JLabel lblWarnStaff;
     private javax.swing.JPanel pnlCard;
     private javax.swing.JPanel pnlCardAuthorize;
     private javax.swing.JPanel pnlCardManage;
@@ -3196,7 +3422,8 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JPanel pnlCardStaff1;
     private javax.swing.JPanel pnlCardStaff2;
     private javax.swing.JPanel pnlCardStatics;
-    private javax.swing.JPanel pnlCategory;
+    private javax.swing.JPanel pnlCategoryStaff;
+    private javax.swing.JPanel pnlCategoryStats;
     private javax.swing.JPanel pnlLogout;
     private javax.swing.JPanel pnlMenu;
     private javax.swing.JPanel pnlPie1;
@@ -3209,6 +3436,7 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JTable tblCustomerS;
     private javax.swing.JTable tblManageAcc;
     private javax.swing.JTable tblManageTrans;
+    private javax.swing.JTable tblStaffInfo;
     private javax.swing.JTable tblTransactionS;
     private javax.swing.JTextField txtAccManage;
     private javax.swing.JTextField txtBranch2;
@@ -3222,6 +3450,7 @@ public class FormStaff extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtPassword3;
     private javax.swing.JFormattedTextField txtReceiverID;
     private javax.swing.JFormattedTextField txtSenderID;
+    private javax.swing.JTextField txtStaffInStaff;
     private javax.swing.JTextField txtStaffManage1;
     private javax.swing.JTextField txtStaffManage2;
     private javax.swing.JTextField txtTransManage;

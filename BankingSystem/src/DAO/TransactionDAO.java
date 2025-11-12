@@ -157,13 +157,13 @@ public class TransactionDAO {
         ResultSet rs = null;
         try{
             String command, addStatus = "";
-            if(status.equals("SUCCESSFUL")) addStatus = " AND status = 'SUCCESSFUL'";
-            else if(status.equals("PENDING")) addStatus = " AND status = 'PENDING'";
-            else if(status.equals("FAILED")) addStatus = " AND status = 'FAILED'";
+            if(status.equals("SUCCESSFUL")) addStatus = " AND status = 'SUCCESSFUL' ";
+            else if(status.equals("PENDING")) addStatus = " AND status = 'PENDING' ";
+            else if(status.equals("FAILED")) addStatus = " AND status = 'FAILED' ";
             if(type.equals("ALL")){
                 command = "SELECT * FROM transactions WHERE "
                 + "( (? = senderID AND sendTime >= ? AND sendTime < ?) "
-                + "OR (? = receiverID AND ((type = 'DEPOSIT' AND receiveTime IS NULL) OR (receiveTime >= ? AND receiveTime < ?)) ) )";
+                + "OR (? = receiverID AND ((receiveTime IS NULL AND sendTime >= ? AND sendTime < ?) OR (receiveTime >= ? AND receiveTime < ?)) ) )";
                 command += addStatus;
                 
                 // System.out.println(command);
@@ -174,6 +174,8 @@ public class TransactionDAO {
                 statement.setString(4, id);
                 statement.setTimestamp(5, Timestamp.valueOf(beginTime));
                 statement.setTimestamp(6, Timestamp.valueOf(endTime)); 
+                statement.setTimestamp(7, Timestamp.valueOf(beginTime));
+                statement.setTimestamp(8, Timestamp.valueOf(endTime)); 
             }
             else if(type.equals("TRANSFER")){
                 command = "SELECT * FROM transactions WHERE type = ? "

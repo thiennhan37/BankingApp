@@ -46,7 +46,8 @@ public class FormLogin extends javax.swing.JFrame {
         setFormRegister();
         setRoundButton();
         btEyePass1.doClick(); btEyePass2.doClick();
-        setVisible(true);
+        this.setResizable(false); 
+        this.setVisible(true);
     }
     public void setRoundButton(){
         
@@ -626,9 +627,6 @@ public class FormLogin extends javax.swing.JFrame {
         Account x = controller.getAccountByEmail(email);
         if(x != null){
             if(x.isActive()) lblWarn2.setText("Account already exists");
-            else{
-                JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
-            }
             return;
         }
         if(!new OTPDialog(this, email, "xác thực tài khoản").isMatch()){
