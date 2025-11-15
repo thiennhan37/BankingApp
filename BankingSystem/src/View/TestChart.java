@@ -11,6 +11,10 @@ import java.util.Locale;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -34,6 +38,7 @@ import org.jfree.data.general.DefaultPieDataset;
  *
  * @author Hi
  */
+
 public class TestChart extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TestChart.class.getName());
@@ -46,6 +51,7 @@ public class TestChart extends javax.swing.JFrame {
 //        showCircleChart();
 //        showCategoryChart();
         setTxtChange();
+        ((AbstractDocument)txtChange.getDocument()).setDocumentFilter(new AlphabetFilter()); 
         this.setLocationRelativeTo(null);
     }
     
@@ -164,9 +170,8 @@ public class TestChart extends javax.swing.JFrame {
                 // Chỉ gọi với document có thuộc tính định dạng (như JTextPane)
             }
         });
-
-        
     }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -183,6 +188,9 @@ public class TestChart extends javax.swing.JFrame {
         pnlCircle.setLayout(new java.awt.BorderLayout());
 
         pnlCategory.setLayout(new java.awt.BorderLayout());
+
+        lblChange.setBackground(new java.awt.Color(102, 255, 255));
+        lblChange.setOpaque(true);
 
         cbBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         cbBox.addActionListener(new java.awt.event.ActionListener() {

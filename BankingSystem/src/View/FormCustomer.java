@@ -32,6 +32,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import org.jfree.chart.ChartFactory;
@@ -70,7 +71,7 @@ public class FormCustomer extends javax.swing.JFrame {
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private ImageIcon FemaleIcon = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
-    private ImageIcon MaleIcon = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemalePerson.png"));
+    private ImageIcon MaleIcon = new javax.swing.ImageIcon(getClass().getResource("/MyImage/MalePerson.png"));
     private DefaultTableModel historyTableModel;
     private DefaultPieDataset datasetPie1, datasetPie2;
     private DefaultCategoryDataset datasetCategory;
@@ -95,6 +96,7 @@ public class FormCustomer extends javax.swing.JFrame {
         
         txtPassword3.setEchoChar((char) 0); 
         cardLayout3 = (CardLayout) pnlCard.getLayout();
+        ((AbstractDocument)txtFullName3.getDocument()).setDocumentFilter(new AlphabetFilter()); 
         historyTableModel = (DefaultTableModel) tblHistory.getModel();
         
         settingGUIComponent();
@@ -103,6 +105,7 @@ public class FormCustomer extends javax.swing.JFrame {
         setAmountText(txtDrawAmount, new JButton[]{btSADraw1, btSADraw2, btSADraw3});
         setAmountText(txtDepositAmount, new JButton[]{btSADeposit1, btSADeposit2, btSADeposit3});
         setTextForNumber(txtTransTo); 
+        setActionHistory();
         addForStat();
         btAll.doClick(); btHome.doClick(); 
         this.setResizable(false);
@@ -247,12 +250,52 @@ public class FormCustomer extends javax.swing.JFrame {
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
         lblWarnSavePass3.setText(""); 
-        if(myAccount.getGender().equals("Female")) lblProfile.setIcon(FemaleIcon);
-        else lblProfile.setIcon(MaleIcon);
+        if(myAccount.getGender().equals("Female")){
+            lblProfile.setIcon(FemaleIcon);
+        }
+        else{
+            lblProfile.setIcon(MaleIcon);
+        }
         
         lblBalance3.setText(numberFormat.format(myAccount.getBalace()));
     }
-    
+    private void setActionHistory(){
+        JComboBox[] arr = {fieldBeginMonth, fieldBeginYear, fieldEndMonth, fieldEndYear, 
+                                fieldStatus, fieldType};
+        for(JComboBox x : arr){
+            x.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    resetHistoryInfo();
+                }
+            });
+        }
+    }
+    private void resetHistoryInfo(){
+        historyTableModel.setRowCount(0); 
+        List<Transaction> lst = transController.filterTransactions(myAccount.getId(), 
+                fieldBeginMonth.getSelectedIndex() + 1, fieldBeginYear.getSelectedIndex() + 1900,
+                fieldEndMonth.getSelectedIndex() + 1, fieldEndYear.getSelectedIndex() + 1900, 
+                fieldType.getSelectedItem().toString(), fieldStatus.getSelectedItem().toString());
+        DateTimeFormatter fm = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+        Collections.sort(lst);
+        for(Transaction x : lst){
+            String c;
+            LocalDateTime time;
+            if(x.getSenderID() == null){ c = "+"; time = x.getReceiveTime();}
+            else if(x.getReceiverID() == null){ c = "-"; time = x.getSendTime();}
+            else{
+                if(x.getSenderID().equals(myAccount.getId())){ c = "-"; time = x.getSendTime();}
+                else{ c = "+"; time = x.getReceiveTime();}
+            }
+            if(!x.getStatus().equals("SUCCESSFUL")) c = "";
+            String timeShow;
+            if(time == null) timeShow = null;
+            else timeShow = time.format(fm);
+            historyTableModel.addRow(new Object[]{x.getTransID(), c + numberFormat.format(x.getAmount()), 
+                x.getType(), x.getStatus(), timeShow, x.getDescription()}); 
+        }
+    }
 
     private void resetAccount(){
         myAccount = accController.getAccountByEmail(myEmail);
@@ -455,6 +498,18 @@ public class FormCustomer extends javax.swing.JFrame {
                    
     }
     
+    private void updateCategoryChart(){
+        LocalDateTime now = LocalDateTime.now();
+        datasetCategory.clear();
+        for(int i = 4; i >= 0; i--){
+            LocalDateTime x = now.minusMonths(i);
+            List<Long> lst = TransactionDAO.getInstance().staticsFor5Month(myAccount.getId(), x.getYear(), x.getMonthValue());
+            // System.out.println(x.getMonthValue() + " " + x.getYear());
+            datasetCategory.addValue(lst.get(0), "Income", x.getMonthValue()+ "/" + x.getYear());
+            datasetCategory.addValue(lst.get(1), "Expense", x.getMonthValue()+ "/" + x.getYear());
+        }
+    }
+            
     private void setCategoryChart(){ 
         LocalDateTime now = LocalDateTime.now();
         for(int i = 4; i >= 0; i--){
@@ -609,7 +664,6 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel24 = new javax.swing.JLabel();
         fieldType = new javax.swing.JComboBox<>();
         jLabel25 = new javax.swing.JLabel();
-        btFindHistory = new javax.swing.JButton();
         fieldStatus = new javax.swing.JComboBox<>();
         jLabel26 = new javax.swing.JLabel();
         pnlCardStatics = new javax.swing.JPanel();
@@ -1471,22 +1525,15 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel24.setText("Begin");
 
         fieldType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ALL", "TRANSFER", "WITHDRAW", "DEPOSIT" }));
+        fieldType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldTypeActionPerformed(evt);
+            }
+        });
 
         jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(178, 137, 145));
         jLabel25.setText("Type");
-
-        btFindHistory.setBackground(new java.awt.Color(153, 255, 255));
-        btFindHistory.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btFindHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Find.png"))); // NOI18N
-        btFindHistory.setText(" Find");
-        btFindHistory.setFocusable(false);
-        btFindHistory.setOpaque(true);
-        btFindHistory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btFindHistoryActionPerformed(evt);
-            }
-        });
 
         fieldStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ALL", "SUCCESSFUL", "PENDING", "FAILED" }));
 
@@ -1501,34 +1548,31 @@ public class FormCustomer extends javax.swing.JFrame {
             .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
                     .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                         .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                                 .addComponent(fieldBeginMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(fieldBeginYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fieldBeginYear, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(12, 12, 12)
                         .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlCardHistoryLayout.createSequentialGroup()
                                 .addComponent(fieldEndMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(fieldEndYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(fieldType, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fieldEndYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlCardHistoryLayout.createSequentialGroup()
-                                .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(pnlCardHistoryLayout.createSequentialGroup()
-                                .addComponent(fieldStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btFindHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                            .addComponent(fieldType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlCardHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(fieldStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         pnlCardHistoryLayout.setVerticalGroup(
@@ -1547,7 +1591,6 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addComponent(fieldBeginYear, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fieldBeginMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fieldType, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btFindHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fieldStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1718,7 +1761,8 @@ public class FormCustomer extends javax.swing.JFrame {
         LocalDate now = LocalDate.now();
         fieldBeginMonth.setSelectedIndex(0); fieldBeginYear.setSelectedIndex(2005 - 1900);
         fieldEndMonth.setSelectedIndex(now.getMonthValue() - 1); fieldEndYear.setSelectedIndex(now.getYear() - 1900);
-        btFindHistory.doClick();
+        fieldStatus.setSelectedIndex(0); fieldType.setSelectedIndex(0); 
+        resetHistoryInfo();
         cardLayout3.show(pnlCard, "History");
     }//GEN-LAST:event_btHistoryActionPerformed
 
@@ -1755,13 +1799,17 @@ public class FormCustomer extends javax.swing.JFrame {
 
     private void txtFullName3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName3FocusLost
         // TODO add your handling code here:
-        txtFullName3.setText(txtFullName3.getText().trim().toUpperCase());
         if(txtFullName3.getText().isEmpty()){
             txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
         }
         else{
             txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
+        
+        String name = txtFullName3.getText().trim().toUpperCase().replaceAll("\\s+", " ");
+        txtFullName3.setText(name);
+
     }//GEN-LAST:event_txtFullName3FocusLost
 
     private void fieldDay3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldDay3FocusLost
@@ -1916,11 +1964,11 @@ public class FormCustomer extends javax.swing.JFrame {
         }
         Account toAccount = accController.getAccountByID(txtTransTo.getText());
         if(toAccount == null || toAccount.getId().equals(myAccount.getId())){ 
-            JOptionPane.showMessageDialog(this, "Account is not valid!", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "The recipient's account is not valid!", "", JOptionPane.WARNING_MESSAGE);
             return;
         }
         if(!toAccount.isActive()){
-            JOptionPane.showMessageDialog(this, "Account is blocked!", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "The recipient's account is blocked!", "", JOptionPane.WARNING_MESSAGE);
             return;
         }
         if(txtTransAmount.getValue() == null || Long.valueOf(txtTransAmount.getValue().toString()) < 1000){
@@ -1951,16 +1999,16 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(myAccount.getId(), toAccount.getId(), 
                 amount, "TRANSFER", txtTransDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "Transfer successfully", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "TRANSFER SUCCESSFULLY", "", JOptionPane.INFORMATION_MESSAGE);
             new FormTransaction(myAccount.getFullName(), toAccount.getFullName(), amount, 
                     txtTransDescription.getText(), LocalDateTime.now());
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "TRANSACTION IS PENDING", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "Transfer failed", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "TRANSFER FAILED", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btTransfer3ActionPerformed
 
     private void txtTransToFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTransToFocusLost
@@ -2008,14 +2056,14 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(myAccount.getId(), null, 
                 amount, "WITHDRAW", txtDrawDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "Withdraw successfully", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "WITHDRAW SUCCESSFULLY", "", JOptionPane.INFORMATION_MESSAGE);
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "TRANSACTION IS PENDING", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "Withdraw failed", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "WITHDRAW FAILED", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btWithdraw3ActionPerformed
 
     private void txtDepositAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDepositAmountActionPerformed
@@ -2048,14 +2096,14 @@ public class FormCustomer extends javax.swing.JFrame {
         int result = transController.Transfer(null, myAccount.getId(), 
                 amount, "DEPOSIT", txtDepositDescription.getText());
         if(result == 1){
-            JOptionPane.showMessageDialog(this, "Deposit successfully", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "DEPOSIT SUCCESSFULLY", "", JOptionPane.INFORMATION_MESSAGE);
             resetAccount();
         }
         else if(result == -1){
-            JOptionPane.showMessageDialog(this, "Transaction is pending", "", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "TRANSACTION IS PENDING", "", JOptionPane.INFORMATION_MESSAGE);
         }
         else
-            JOptionPane.showMessageDialog(this, "Deposit failed", "", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "DEPOSIT FAILED", "", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_btDeposit3ActionPerformed
 
     private void fieldBeginMonthFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldBeginMonthFocusLost
@@ -2074,35 +2122,9 @@ public class FormCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_fieldEndMonthFocusLost
 
-    private void btFindHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFindHistoryActionPerformed
-        // TODO add your handling code here:
-        historyTableModel.setRowCount(0); 
-        List<Transaction> lst = transController.filterTransactions(myAccount.getId(), 
-                fieldBeginMonth.getSelectedIndex() + 1, fieldBeginYear.getSelectedIndex() + 1900,
-                fieldEndMonth.getSelectedIndex() + 1, fieldEndYear.getSelectedIndex() + 1900, 
-                fieldType.getSelectedItem().toString(), fieldStatus.getSelectedItem().toString());
-        DateTimeFormatter fm = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
-        Collections.sort(lst);
-        for(Transaction x : lst){
-            String c;
-            LocalDateTime time;
-            if(x.getSenderID() == null){ c = "+"; time = x.getReceiveTime();}
-            else if(x.getReceiverID() == null){ c = "-"; time = x.getSendTime();}
-            else{
-                if(x.getSenderID().equals(myAccount.getId())){ c = "-"; time = x.getSendTime();}
-                else{ c = "+"; time = x.getReceiveTime();}
-            }
-            if(!x.getStatus().equals("SUCCESSFUL")) c = "";
-            String timeShow;
-            if(time == null) timeShow = null;
-            else timeShow = time.format(fm);
-            historyTableModel.addRow(new Object[]{x.getTransID(), c + numberFormat.format(x.getAmount()), 
-                x.getType(), x.getStatus(), timeShow, x.getDescription()}); 
-        }
-    }//GEN-LAST:event_btFindHistoryActionPerformed
-
     private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
         // TODO add your handling code here:
+        updateCategoryChart();
         cardLayout3.show(pnlCard, "Statics");
     }//GEN-LAST:event_btStaticsActionPerformed
 
@@ -2118,6 +2140,10 @@ public class FormCustomer extends javax.swing.JFrame {
         this.dispose();
         new FormLogin();
     }//GEN-LAST:event_btLogoutActionPerformed
+
+    private void fieldTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldTypeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2157,7 +2183,6 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JButton btDeposit3;
     private javax.swing.JButton btEyePass3;
     private javax.swing.JRadioButton btFemale3;
-    private javax.swing.JButton btFindHistory;
     private javax.swing.JButton btHistory;
     private javax.swing.JButton btHome;
     private javax.swing.JButton btLogout;

@@ -14,6 +14,7 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import java.awt.*;
 import javax.swing.*;
 import View.FormCustomer;
+import javax.swing.text.AbstractDocument;
 
 /**
  *
@@ -42,6 +43,7 @@ public class FormLogin extends javax.swing.JFrame {
         // txtPassword1.setEchoChar((char) 0);
         // txtPassword2.setEchoChar((char) 0); 
         cardLayout = (CardLayout) pnlCardBegin.getLayout();
+        ((AbstractDocument)txtFullName2.getDocument()).setDocumentFilter(new AlphabetFilter());
         this.setLocationRelativeTo(null);
         setFormRegister();
         setRoundButton();
@@ -646,13 +648,16 @@ public class FormLogin extends javax.swing.JFrame {
 
     private void txtFullName2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName2FocusLost
         // TODO add your handling code here:
-        txtFullName2.setText(txtFullName2.getText().trim().toUpperCase());
         if(txtFullName2.getText().isEmpty()){
             txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
         }
         else{
             txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
+        
+        String name = txtFullName2.getText().trim().toUpperCase().replaceAll("\\s+", " ");
+        txtFullName2.setText(name);
     }//GEN-LAST:event_txtFullName2FocusLost
 
     private void txtEmail2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEmail2FocusLost

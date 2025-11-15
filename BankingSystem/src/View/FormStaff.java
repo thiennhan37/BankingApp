@@ -41,6 +41,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import javax.swing.text.AbstractDocument;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -78,9 +79,10 @@ public class FormStaff extends javax.swing.JFrame {
     private ImageIcon logoutStatic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutStatic.png"));
     private ImageIcon logoutDynamic = new javax.swing.ImageIcon(getClass().getResource("/MyImage/logoutDynamic1.gif"));
     private ImageIcon FemaleAdmin = new javax.swing.ImageIcon(getClass().getResource("/MyImage/FemaleAdmin.png"));
+    private ImageIcon MaleAdmin = new javax.swing.ImageIcon(getClass().getResource("/MyImage/MaleAdmin.png"));
     private DefaultTableModel authorizeTableModel, searchCusTBMD, searchTransTBMD, manageAccTBMD, manageTransTBMD, staffInfoTBMD;
     private NumberFormat numberFormat = NumberFormat.getInstance(new Locale("vi", "VN"));;
-    private DateTimeFormatter fm2Y = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+    private DateTimeFormatter fm2Y = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
     private DateTimeFormatter fm4Y = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private DateTimeFormatter fmForBirth = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private Locale myLocale = new Locale("vi", "VN");
@@ -116,6 +118,8 @@ public class FormStaff extends javax.swing.JFrame {
         manageTransTBMD = (DefaultTableModel) tblManageTrans.getModel();
         manageAccTBMD = (DefaultTableModel) tblManageAcc.getModel();
         staffInfoTBMD = (DefaultTableModel) tblStaffInfo.getModel();
+        ((AbstractDocument)txtFullName3.getDocument()).setDocumentFilter(new AlphabetFilter());
+        ((AbstractDocument)txtFullName2.getDocument()).setDocumentFilter(new AlphabetFilter()); 
         settingGUIComponent();
         setMouseList(); 
         setRestrict();
@@ -203,7 +207,7 @@ public class FormStaff extends javax.swing.JFrame {
         transCLMD.getColumn(1).setPreferredWidth(60);
         transCLMD.getColumn(2).setPreferredWidth(60);
         transCLMD.getColumn(3).setPreferredWidth(90);
-        transCLMD.getColumn(6).setPreferredWidth(90);
+        transCLMD.getColumn(6).setPreferredWidth(100);
         
         datasetPie1 = new DefaultPieDataset();
         datasetPie2 = new DefaultPieDataset();
@@ -302,6 +306,11 @@ public class FormStaff extends javax.swing.JFrame {
         fieldYear3.setSelectedIndex(myAccount.getBirthDay().getYear() - 1900);
         if(myAccount.getGender().equals("Female")){
             btFemale3.setSelected(true);
+            lblProfile.setIcon(FemaleAdmin); 
+        }
+        else{
+            btMale3.setSelected(true);
+            lblProfile.setIcon(MaleAdmin); 
         }
         txtPassword3.setText("");
         txtConfirmPass3.setText(""); 
@@ -517,8 +526,6 @@ public class FormStaff extends javax.swing.JFrame {
     private void setCategoryChart(){ 
 
         LinkedHashMap<String, Long> lst = TransactionDAO.getInstance().staticsPremierCus();
-        // System.out.println(x.getMonthValue() + " " + x.getYear());
-        int cnt = 0;
         for(String id : lst.keySet()){
             datasetCategory.addValue(lst.get(id), "Balance", id); 
         }
@@ -561,7 +568,14 @@ public class FormStaff extends javax.swing.JFrame {
         pnlCategoryStats.add(chartPanel, BorderLayout.CENTER);
         
     }
-    
+    private void updateCategoryChartBalance(){
+        LinkedHashMap<String, Long> lst = TransactionDAO.getInstance().staticsPremierCus();
+        datasetCategory.clear();
+        for(String id : lst.keySet()){
+            datasetCategory.addValue(lst.get(id), "Balance", id); 
+        }
+    }
+            
     private void setCategoryChartForStaff(){ 
         LocalDate now = LocalDate.now();
         for(int i = 4; i >= 0; i--){
@@ -2587,13 +2601,15 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void txtFullName3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName3FocusLost
         // TODO add your handling code here:
-        txtFullName3.setText(txtFullName3.getText().trim().toUpperCase());
         if(txtFullName3.getText().isEmpty()){
             txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
         }
         else{
             txtFullName3.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
+        String name = txtFullName3.getText().trim().toUpperCase().replaceAll("\\s+", " ");
+        txtFullName3.setText(name);
     }//GEN-LAST:event_txtFullName3FocusLost
 
     private void fieldDay3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fieldDay3FocusLost
@@ -2890,6 +2906,7 @@ public class FormStaff extends javax.swing.JFrame {
 
     private void btStaticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaticsActionPerformed
         // TODO add your handling code here:
+        updateCategoryChartBalance();
         cardLayout3.show(pnlCard, "statics");
     }//GEN-LAST:event_btStaticsActionPerformed
 
@@ -2968,13 +2985,16 @@ public class FormStaff extends javax.swing.JFrame {
     }
     private void txtFullName2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFullName2FocusLost
         // TODO add your handling code here:
-        txtFullName2.setText(txtFullName2.getText().trim().toUpperCase());
         if(txtFullName2.getText().isEmpty()){
             txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#FF3333; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            return;
         }
         else{
             txtFullName2.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
         }
+        
+        String name = txtFullName2.getText().trim().toUpperCase().replaceAll("\\s+", " ");
+        txtFullName2.setText(name);
     }//GEN-LAST:event_txtFullName2FocusLost
 
     private void txtEmail2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEmail2FocusLost

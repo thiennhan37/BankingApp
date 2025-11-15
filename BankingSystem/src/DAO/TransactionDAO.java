@@ -341,7 +341,7 @@ public class TransactionDAO {
                     result[0] += rs.getLong("tong");
                     result[1] += rs.getLong("sl");
                 }
-                else if(type.equals("DEPOSIT")){
+                else if(type.equals("WITHDRAW")){
                     result[2] += rs.getLong("tong");
                     result[3] += rs.getLong("sl");
                 }
