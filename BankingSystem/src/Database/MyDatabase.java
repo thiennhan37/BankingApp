@@ -19,9 +19,9 @@ public class MyDatabase {
             String username = "root";
             String password = "NhanThien24";
 
-//            String url = "jdbc:mySQL://sql12.freesqldatabase.com:3306/sql12802966";
-//            String username = "sql12802966";
-//            String password = "fPjnUSFU27";
+//            String url = "jdbc:mySQL://sql12.freesqldatabase.com:3306/sql12807963";
+//            String username = "sql12807963";
+//            String password = "bgq2clW4Pk";
             c = DriverManager.getConnection(url, username, password);
         }
         catch(SQLException e){
