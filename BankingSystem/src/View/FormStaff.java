@@ -124,6 +124,7 @@ public class FormStaff extends javax.swing.JFrame {
         setMouseList(); 
         setRestrict();
         setManageFunction(); setTransManage(); setAccountManage();
+        setForSAPanel();
         addForStat(); btAllTime.doClick(); 
         this.setResizable(false);
         this.setLocationRelativeTo(null);
@@ -712,6 +713,31 @@ public class FormStaff extends javax.swing.JFrame {
             });
         }
     }
+    
+    private void setForSAPanel(){
+        JComboBox arr1[] = {fieldBeginMonthS, fieldBeginYearS, fieldEndMonthS, fieldEndYearS, fieldTypeS, fieldStatusS}; 
+        for(JComboBox x : arr1){
+            x.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btFindSActionPerformed(e); 
+                }
+                
+            });
+        }
+        JComboBox arr2[] = {fieldBeginMonthA, fieldBeginYearA, fieldEndMonthA, fieldEndYearA, fieldTypeA}; 
+        for(JComboBox x : arr2){
+            x.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btFindAActionPerformed(e); 
+                }
+                
+            });
+        }
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -747,16 +773,6 @@ public class FormStaff extends javax.swing.JFrame {
         lblLineCol1 = new javax.swing.JLabel();
         lblLineRow2 = new javax.swing.JLabel();
         pnlCard = new javax.swing.JPanel();
-        pnlCardStatics = new javax.swing.JPanel();
-        bt1Week = new javax.swing.JButton();
-        pnlPie1 = new javax.swing.JPanel();
-        pnlPie2 = new javax.swing.JPanel();
-        bt1Month = new javax.swing.JButton();
-        bt6Month = new javax.swing.JButton();
-        bt1Year = new javax.swing.JButton();
-        btAllTime = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        pnlCategoryStats = new javax.swing.JPanel();
         pnlCardProfile = new javax.swing.JPanel();
         pnlSubProfile1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -781,6 +797,16 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         btChangePass3 = new javax.swing.JButton();
         lblWarnSavePass3 = new javax.swing.JLabel();
+        pnlCardStatics = new javax.swing.JPanel();
+        bt1Week = new javax.swing.JButton();
+        pnlPie1 = new javax.swing.JPanel();
+        pnlPie2 = new javax.swing.JPanel();
+        bt1Month = new javax.swing.JButton();
+        bt6Month = new javax.swing.JButton();
+        bt1Year = new javax.swing.JButton();
+        btAllTime = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        pnlCategoryStats = new javax.swing.JPanel();
         pnlCardStaff1 = new javax.swing.JPanel();
         btAddStaffAcc = new javax.swing.JButton();
         btFindStaff = new javax.swing.JButton();
@@ -1096,92 +1122,6 @@ public class FormStaff extends javax.swing.JFrame {
 
         pnlCard.setLayout(new java.awt.CardLayout());
 
-        bt1Week.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        bt1Week.setForeground(new java.awt.Color(102, 102, 102));
-        bt1Week.setText("1 Week");
-
-        pnlPie1.setLayout(new java.awt.BorderLayout());
-
-        pnlPie2.setLayout(new java.awt.BorderLayout());
-
-        bt1Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        bt1Month.setForeground(new java.awt.Color(102, 102, 102));
-        bt1Month.setText("1 Month");
-
-        bt6Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        bt6Month.setForeground(new java.awt.Color(102, 102, 102));
-        bt6Month.setText("6 Month");
-
-        bt1Year.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        bt1Year.setForeground(new java.awt.Color(102, 102, 102));
-        bt1Year.setText("1 Year");
-
-        btAllTime.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        btAllTime.setForeground(new java.awt.Color(102, 102, 102));
-        btAllTime.setText("ALL");
-
-        jTextField1.setBackground(new java.awt.Color(0, 0, 0));
-
-        pnlCategoryStats.setLayout(new java.awt.BorderLayout());
-
-        javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
-        pnlCardStatics.setLayout(pnlCardStaticsLayout);
-        pnlCardStaticsLayout.setHorizontalGroup(
-            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                        .addGap(78, 78, 78)
-                        .addComponent(bt1Week)
-                        .addGap(18, 18, 18)
-                        .addComponent(bt1Month)
-                        .addGap(18, 18, 18)
-                        .addComponent(bt6Month)
-                        .addGap(18, 18, 18)
-                        .addComponent(bt1Year)
-                        .addGap(18, 18, 18)
-                        .addComponent(btAllTime)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1)
-                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 15, Short.MAX_VALUE))
-                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                                .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)))))
-                .addContainerGap())
-        );
-        pnlCardStaticsLayout.setVerticalGroup(
-            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(bt6Month, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btAllTime, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        pnlCard.add(pnlCardStatics, "statics");
-
         pnlCardProfile.setName(""); // NOI18N
 
         pnlSubProfile1.setBackground(new java.awt.Color(255, 255, 255));
@@ -1453,6 +1393,92 @@ public class FormStaff extends javax.swing.JFrame {
         );
 
         pnlCard.add(pnlCardProfile, "Profile");
+
+        bt1Week.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Week.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Week.setText("1 Week");
+
+        pnlPie1.setLayout(new java.awt.BorderLayout());
+
+        pnlPie2.setLayout(new java.awt.BorderLayout());
+
+        bt1Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Month.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Month.setText("1 Month");
+
+        bt6Month.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt6Month.setForeground(new java.awt.Color(102, 102, 102));
+        bt6Month.setText("6 Month");
+
+        bt1Year.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bt1Year.setForeground(new java.awt.Color(102, 102, 102));
+        bt1Year.setText("1 Year");
+
+        btAllTime.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btAllTime.setForeground(new java.awt.Color(102, 102, 102));
+        btAllTime.setText("ALL");
+
+        jTextField1.setBackground(new java.awt.Color(0, 0, 0));
+
+        pnlCategoryStats.setLayout(new java.awt.BorderLayout());
+
+        javax.swing.GroupLayout pnlCardStaticsLayout = new javax.swing.GroupLayout(pnlCardStatics);
+        pnlCardStatics.setLayout(pnlCardStaticsLayout);
+        pnlCardStaticsLayout.setHorizontalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(bt1Week)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt6Month)
+                        .addGap(18, 18, 18)
+                        .addComponent(bt1Year)
+                        .addGap(18, 18, 18)
+                        .addComponent(btAllTime)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField1)
+                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 15, Short.MAX_VALUE))
+                            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                                .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)))))
+                .addContainerGap())
+        );
+        pnlCardStaticsLayout.setVerticalGroup(
+            pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCardStaticsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(bt1Month, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt1Week, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(bt6Month, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bt1Year, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btAllTime, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlCardStaticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlPie2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPie1, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(pnlCategoryStats, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pnlCard.add(pnlCardStatics, "statics");
 
         pnlCardStaff1.setAlignmentX(0.0F);
 
@@ -2097,6 +2123,11 @@ public class FormStaff extends javax.swing.JFrame {
         tblTransactionS.setSelectionBackground(new java.awt.Color(153, 255, 153));
         tblTransactionS.setSelectionForeground(new java.awt.Color(0, 0, 153));
         tblTransactionS.setShowGrid(true);
+        tblTransactionS.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTransactionSMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblTransactionS);
 
         fieldEndYearS.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910", "1911", "1912", "1913", "1914", "1915", "1916", "1917", "1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970", "1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980", "1981", "1982", "1983", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
@@ -3286,6 +3317,20 @@ public class FormStaff extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btDeactivateStaffActionPerformed
+
+    private void tblTransactionSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTransactionSMouseClicked
+        // TODO add your handling code here:
+        if(evt.getClickCount() == 2 && !evt.isConsumed()){
+            int row = tblTransactionS.rowAtPoint(evt.getPoint());
+            if(row != -1){
+                String transID = tblTransactionS.getValueAt(row, 0).toString();
+                // System.out.println(transID);
+                String decision = tblTransactionS.getValueAt(row, 5).toString();
+                new FormTransaction(transID, decision);
+            }
+            evt.consume();
+        }
+    }//GEN-LAST:event_tblTransactionSMouseClicked
 
     /**
      * @param args the command line arguments

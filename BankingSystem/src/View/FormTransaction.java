@@ -76,13 +76,17 @@ public class FormTransaction extends javax.swing.JFrame {
         this.time = x.getSendTime();
         initComponents();
         getInfor();
-        if(decision.equals("CONFIRM")){
+        if(decision.equals("CONFIRM") || decision.equals("SUCCESSFUL")){
             pnlMain.setBackground(new Color(153,255,255));
             title += "SUCCESSFUL ";
         }
-        else{
+        else if(decision.equals("REJECT") || decision.equals("FAILED")){
             pnlMain.setBackground(new Color(255,153,153));
             title += "FAILED ";
+        }
+        else{
+            pnlMain.setBackground(new Color(255,204,102));
+            title += "PENDING ";
         }
         title += x.getType();
         lblTitle.setText(title);

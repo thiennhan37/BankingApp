@@ -18,6 +18,9 @@ public class AccountControl {
     private AccountDAO accountDAO;
     private FormCustomer formCustomer;
     private FormStaff formStaff;
+    public AccountControl(){
+        this.accountDAO = AccountDAO.getInstance();
+    }
     public AccountControl(FormLogin formLogin) {
         this.formLogin = formLogin;
         this.accountDAO = AccountDAO.getInstance();

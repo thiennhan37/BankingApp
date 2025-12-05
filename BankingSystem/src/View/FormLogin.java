@@ -198,6 +198,11 @@ public class FormLogin extends javax.swing.JFrame {
         btForgotPass.setContentAreaFilled(false);
         btForgotPass.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         btForgotPass.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btForgotPass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btForgotPassActionPerformed(evt);
+            }
+        });
 
         btCreateAcc.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btCreateAcc.setForeground(new java.awt.Color(178, 137, 145));
@@ -399,6 +404,7 @@ public class FormLogin extends javax.swing.JFrame {
             }
         });
 
+        lblWarn2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblWarn2.setForeground(new java.awt.Color(255, 51, 51));
 
         javax.swing.GroupLayout pnlRegisterLayout = new javax.swing.GroupLayout(pnlRegister);
@@ -785,6 +791,24 @@ public class FormLogin extends javax.swing.JFrame {
     private void txtFullName2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFullName2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFullName2ActionPerformed
+
+    private void btForgotPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btForgotPassActionPerformed
+        // TODO add your handling code here:
+        String inputEmail = JOptionPane.showInputDialog(this, "Please enter your email address", 
+                "Reset Password", JOptionPane.QUESTION_MESSAGE);
+        if(inputEmail == null || inputEmail.isBlank()) return;
+        Account acc = controller.getAccountByEmail(inputEmail);
+        if(acc == null){
+            JOptionPane.showMessageDialog(this, "Account does not exist", 
+                "", JOptionPane.WARNING_MESSAGE);
+            btForgotPassActionPerformed(evt); 
+            System.out.println("aaa");
+            return;
+        }
+        if(new OTPDialog(this, inputEmail, "đặt lại mật khẩu").isMatch()){
+            new ResetPassword(inputEmail);
+        }
+    }//GEN-LAST:event_btForgotPassActionPerformed
 
     /**
      * @param args the command line arguments
