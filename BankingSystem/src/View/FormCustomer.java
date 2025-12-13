@@ -597,7 +597,6 @@ public class FormCustomer extends javax.swing.JFrame {
         pnlCard = new javax.swing.JPanel();
         pnlCardHome = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         pnlCardProfile = new javax.swing.JPanel();
         pnlSubProfile1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -700,7 +699,6 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel1.setText("Account Number");
 
         lblAccNumber3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblAccNumber3.setForeground(new java.awt.Color(255, 255, 255));
         lblAccNumber3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblAccNumber3.setText("999999");
         lblAccNumber3.setToolTipText("");
@@ -710,7 +708,6 @@ public class FormCustomer extends javax.swing.JFrame {
         jLabel3.setText("Balance");
 
         lblBalance3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblBalance3.setForeground(new java.awt.Color(255, 255, 255));
         lblBalance3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblBalance3.setText("1000000000");
 
@@ -736,15 +733,12 @@ public class FormCustomer extends javax.swing.JFrame {
                     .addComponent(lblFullName3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btReset3)
-                .addGap(16, 16, 16))
+                .addGap(17, 17, 17))
         );
         pnlTopLayout.setVerticalGroup(
             pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlTopLayout.createSequentialGroup()
                 .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlTopLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(btReset3))
                     .addGroup(pnlTopLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(lblFullName3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -755,7 +749,10 @@ public class FormCustomer extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlTopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblBalance3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(lblBalance3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(pnlTopLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addComponent(btReset3)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -893,29 +890,20 @@ public class FormCustomer extends javax.swing.JFrame {
 
         pnlCardHome.setAlignmentX(0.0F);
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/Giám đốc nhân sự 093 456 789 xinchao@trangwebhay.vn.gif"))); // NOI18N
-
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/ChucTet.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MyImage/592(2).png"))); // NOI18N
+        jLabel2.setToolTipText("");
 
         javax.swing.GroupLayout pnlCardHomeLayout = new javax.swing.GroupLayout(pnlCardHome);
         pnlCardHome.setLayout(pnlCardHomeLayout);
         pnlCardHomeLayout.setHorizontalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addGroup(pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlCardHomeLayout.setVerticalGroup(
             pnlCardHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCardHomeLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 184, Short.MAX_VALUE)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 493, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pnlCard.add(pnlCardHome, "Home");
@@ -2167,7 +2155,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "nhuquynh@gmail.com";
+        String email = "thiennhan@gmail.com";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email));
     }
@@ -2233,7 +2221,6 @@ public class FormCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;

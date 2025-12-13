@@ -5,8 +5,10 @@
         <group>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormCustomer.java</file>
             <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormStaff.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/test/View/FormTest.java</file>
-            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormTransaction.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/OTPDialog.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Process/MainProcess.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/View/FormLogin.java</file>
+            <file>file:/D:/test_git/github/BankingApp/BankingSystem/src/Database/MyDatabase.java</file>
         </group>
     </open-files>
 </project-private>

@@ -1612,6 +1612,11 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtFullName2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="1"/>
+                    </Property>
+                  </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtFullName2FocusLost"/>
                   </Events>
@@ -1628,6 +1633,11 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtEmail2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="1"/>
+                    </Property>
+                  </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtEmail2FocusLost"/>
                   </Events>
@@ -1644,6 +1654,11 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JPasswordField" name="txtPassword2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="1"/>
+                    </Property>
+                  </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPassword2FocusLost"/>
                   </Events>
@@ -1660,6 +1675,11 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JPasswordField" name="txtConfirmPass2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="1"/>
+                    </Property>
+                  </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtConfirmPass2FocusLost"/>
                   </Events>
@@ -2027,6 +2047,11 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtBranch2">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="1"/>
+                    </Property>
+                  </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtBranch2FocusLost"/>
                   </Events>

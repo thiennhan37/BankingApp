@@ -1627,6 +1627,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel18.setForeground(new java.awt.Color(178, 137, 145));
         jLabel18.setText("Fullname");
 
+        txtFullName2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtFullName2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtFullName2FocusLost(evt);
@@ -1637,6 +1638,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel20.setForeground(new java.awt.Color(178, 137, 145));
         jLabel20.setText("Email");
 
+        txtEmail2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtEmail2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtEmail2FocusLost(evt);
@@ -1647,6 +1649,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel21.setForeground(new java.awt.Color(178, 137, 145));
         jLabel21.setText("Password");
 
+        txtPassword2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtPassword2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtPassword2FocusLost(evt);
@@ -1657,6 +1660,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel22.setForeground(new java.awt.Color(178, 137, 145));
         jLabel22.setText("Confirm Password");
 
+        txtConfirmPass2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtConfirmPass2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtConfirmPass2FocusLost(evt);
@@ -1748,6 +1752,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(178, 137, 145));
         jLabel2.setText("Branch");
 
+        txtBranch2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtBranch2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtBranch2FocusLost(evt);

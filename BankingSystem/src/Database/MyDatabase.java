@@ -15,13 +15,13 @@ public class MyDatabase {
         try{
             com.mysql.jdbc.Driver driver = new com.mysql.jdbc.Driver();
             DriverManager.registerDriver(driver);
-            String url = "jdbc:mySQL://localhost:3306/jdbc_test";
-            String username = "root";
-            String password = "NhanThien24";
+//            String url = "jdbc:mySQL://localhost:3306/jdbc_test";
+//            String username = "root";
+//            String password = "NhanThien24";
 
-//            String url = "jdbc:mySQL://sql12.freesqldatabase.com:3306/sql12807963";
-//            String username = "sql12807963";
-//            String password = "bgq2clW4Pk";
+            String url = "jdbc:mySQL://sql12.freesqldatabase.com:3306/sql12811714";
+            String username = "sql12811714";
+            String password = "x98IGG27fe";
             c = DriverManager.getConnection(url, username, password);
         }
         catch(SQLException e){

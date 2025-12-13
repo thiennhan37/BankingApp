@@ -71,6 +71,7 @@ public class ResetPassword extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(178, 137, 145));
         jLabel9.setText("Password");
 
+        txtPassword2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtPassword2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtPassword2FocusLost(evt);
@@ -89,6 +90,7 @@ public class ResetPassword extends javax.swing.JFrame {
         jLabel10.setForeground(new java.awt.Color(178, 137, 145));
         jLabel10.setText("Confirm Password");
 
+        txtConfirmPass2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtConfirmPass2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtConfirmPass2FocusLost(evt);

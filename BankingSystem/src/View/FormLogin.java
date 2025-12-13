@@ -75,13 +75,17 @@ public class FormLogin extends javax.swing.JFrame {
         JTextField[] arr = {txtEmail1, txtPassword1};
         for(JTextField x : arr){
             x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            x.setText(""); 
         }
     }
     private void resetPartRegister(){
         JTextField[] arr = {txtEmail2, txtPassword2, txtFullName2, txtConfirmPass2};
         for(JTextField x : arr){
             x.putClientProperty("FlatLaf.style", "arc:20; borderColor:#B28991; focusedBorderColor:#99FFFF; background:#F0F8FF;");
+            x.setText("");
         }
+        fieldDay2.setSelectedIndex(0); fieldMonth2.setSelectedIndex(0); fieldYear2.setSelectedIndex(0);
+        btMale2.setSelected(true); 
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -152,6 +156,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(178, 137, 145));
         jLabel4.setText("Email");
 
+        txtEmail1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtEmail1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtEmail1FocusLost(evt);
@@ -175,6 +180,7 @@ public class FormLogin extends javax.swing.JFrame {
             }
         });
 
+        txtPassword1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtPassword1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtPassword1FocusLost(evt);
@@ -284,6 +290,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(178, 137, 145));
         jLabel7.setText("Fullname");
 
+        txtFullName2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtFullName2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtFullName2FocusLost(evt);
@@ -299,6 +306,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel8.setForeground(new java.awt.Color(178, 137, 145));
         jLabel8.setText("Email");
 
+        txtEmail2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtEmail2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtEmail2FocusLost(evt);
@@ -309,6 +317,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(178, 137, 145));
         jLabel9.setText("Password");
 
+        txtPassword2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtPassword2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtPassword2FocusLost(evt);
@@ -319,6 +328,7 @@ public class FormLogin extends javax.swing.JFrame {
         jLabel10.setForeground(new java.awt.Color(178, 137, 145));
         jLabel10.setText("Confirm Password");
 
+        txtConfirmPass2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         txtConfirmPass2.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtConfirmPass2FocusLost(evt);
@@ -495,7 +505,7 @@ public class FormLogin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtConfirmPass2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblWarn2, javax.swing.GroupLayout.DEFAULT_SIZE, 12, Short.MAX_VALUE)
+                .addComponent(lblWarn2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btRegister2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
