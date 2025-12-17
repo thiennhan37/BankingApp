@@ -647,6 +647,7 @@ public class FormLogin extends javax.swing.JFrame {
             if(x.isActive()) lblWarn2.setText("Account already exists");
             return;
         }
+        lblWarn2.setText(""); 
         if(!new OTPDialog(this, email, "xác thực tài khoản").isMatch()){
             return;
         }

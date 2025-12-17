@@ -15,7 +15,7 @@ public class MyDatabase {
         try{
             com.mysql.jdbc.Driver driver = new com.mysql.jdbc.Driver();
             DriverManager.registerDriver(driver);
-//            String url = "jdbc:mySQL://localhost:3306/jdbc_test";
+//            String url = "jdbc:mySQL://localhost:3306/banking";
 //            String username = "root";
 //            String password = "NhanThien24";
 

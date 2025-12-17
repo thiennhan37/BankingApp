@@ -1736,6 +1736,7 @@ public class FormStaff extends javax.swing.JFrame {
         jLabel33.setForeground(new java.awt.Color(178, 137, 145));
         jLabel33.setText("Gender");
 
+        lblWarn2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblWarn2.setForeground(new java.awt.Color(255, 51, 51));
 
         btExit2.setBackground(new java.awt.Color(153, 255, 255));
@@ -2779,7 +2780,8 @@ public class FormStaff extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "", "", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-
+        txtPassword3.setText("");
+        txtConfirmPass3.setText("");
     }//GEN-LAST:event_btChangePass3ActionPerformed
 
     private void btStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStaffActionPerformed
@@ -3132,6 +3134,7 @@ public class FormStaff extends javax.swing.JFrame {
             lblWarn2.setText("Account already exists");
             return;
         }
+        lblWarn2.setText(""); 
         if(!new OTPDialog(this, myAccount.getEmail(), "xác thực tài khoản").isMatch()){
             return;
         }

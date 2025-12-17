@@ -504,7 +504,7 @@ public class FormCustomer extends javax.swing.JFrame {
         for(int i = 4; i >= 0; i--){
             LocalDateTime x = now.minusMonths(i);
             List<Long> lst = TransactionDAO.getInstance().staticsFor5Month(myAccount.getId(), x.getYear(), x.getMonthValue());
-            // System.out.println(x.getMonthValue() + " " + x.getYear());
+            // System.out.println(x.getMonthValue() + " " + lst.get(0) + " " + lst.get(1));
             datasetCategory.addValue(lst.get(0), "Income", x.getMonthValue()+ "/" + x.getYear());
             datasetCategory.addValue(lst.get(1), "Expense", x.getMonthValue()+ "/" + x.getYear());
         }
@@ -2155,7 +2155,7 @@ public class FormCustomer extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        String email = "thiennhan@gmail.com";
+        String email = "n23dccn110@student.ptithcm.edu.vn";
         
         java.awt.EventQueue.invokeLater(() -> new FormCustomer(email));
     }
